@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KurdLeave — User Management</title>
+  <link rel="stylesheet" href="../admincss/admin-styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Main Header -->
+    <table class="main-header">
+      <tr>
+        <td colspan="7">
+          <h1>KurdLeave System - ADMIN PANEL</h1>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="admin_dashboard.html"><i class="fas fa-home"></i> Admin Home</a></td>
+        <td><a href="admin_leaves.html"><i class="fas fa-calendar-alt"></i> Leave Management</a></td>
+        <td><b><a href="admin_users.html"><i class="fas fa-users"></i> User Management</a></b></td>
+        <td><a href="admin_reports.html"><i class="fas fa-chart-bar"></i> Reports</a></td>
+        <td><a href="admin_settings.html"><i class="fas fa-cog"></i> System Settings</a></td>
+        <td><a href="admin_logs.html"><i class="fas fa-history"></i> Activity Logs</a></td>
+        <td><a href="../user/login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></td>
+      </tr>
+    </table>
+    
+    <!-- Page Header -->
+    <div class="content-panel">
+      <div class="panel-heading text-center">
+        <h2><i class="fas fa-users"></i> User Management</h2>
+        <p>Today is <b>April 28, 2025</b> (Monday)</p>
+      </div>
+      
+      <!-- User Search and Filters -->
+      <div class="card mb-3">
+        <div class="card-header"><i class="fas fa-search"></i> Find Users</div>
+        <form class="form-grid mt-2">
+          <div>
+            <label for="search-query">Search:</label>
+            <input type="text" id="search-query" placeholder="Name, email or employee ID">
+          </div>
+          
+          <div>
+            <label for="department">Department:</label>
+            <select id="department">
+              <option value="all">All Departments</option>
+              <option value="engineering">Engineering</option>
+              <option value="hr">Human Resources</option>
+              <option value="finance">Finance</option>
+              <option value="sales">Sales</option>
+              <option value="marketing">Marketing</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="role">Role:</label>
+            <select id="role">
+              <option value="all">All Roles</option>
+              <option value="admin">Administrator</option>
+              <option value="manager">Manager</option>
+              <option value="employee">Employee</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="status">Status:</label>
+            <select id="status">
+              <option value="all">All Status</option>
+              <option value="active" selected>Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+          
+          <div class="grid-span-2 text-center mt-2">
+            <button type="button" class="btn-success"><i class="fas fa-search"></i> Search</button>
+            <button type="reset" class="btn-danger"><i class="fas fa-times"></i> Clear</button>
+            <button type="button" class="btn"><i class="fas fa-plus-circle"></i> Add New User</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- User List -->
+      <div class="card">
+        <div class="card-header">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><i class="fas fa-list"></i> User List (35 users)</span>
+            <div>
+              <button type="button" class="btn-sm"><i class="fas fa-file-export"></i> Export</button>
+              <button type="button" class="btn-sm"><i class="fas fa-envelope"></i> Email All</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" id="select-all">
+                </th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Manager</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">JD</div>
+                    <div>John Doe</div>
+                  </div>
+                </td>
+                <td>john.doe@example.com</td>
+                <td>Engineering</td>
+                <td>Manager</td>
+                <td>Rawa Dara</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Today, 09:45 AM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">JS</div>
+                    <div>Jane Smith</div>
+                  </div>
+                </td>
+                <td>jane.smith@example.com</td>
+                <td>Human Resources</td>
+                <td>Administrator</td>
+                <td>-</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Today, 08:30 AM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">RD</div>
+                    <div>Rawa Dara</div>
+                  </div>
+                </td>
+                <td>rawa@example.com</td>
+                <td>Engineering</td>
+                <td>Director</td>
+                <td>-</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Today, 10:15 AM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">MB</div>
+                    <div>Michael Brown</div>
+                  </div>
+                </td>
+                <td>michael@example.com</td>
+                <td>Engineering</td>
+                <td>Employee</td>
+                <td>John Doe</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Today, 08:45 AM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">SC</div>
+                    <div>Sarah Connor</div>
+                  </div>
+                </td>
+                <td>sarah@example.com</td>
+                <td>Marketing</td>
+                <td>Manager</td>
+                <td>Rawa Dara</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Yesterday, 17:30 PM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">KF</div>
+                    <div>Karoz Fryad</div>
+                  </div>
+                </td>
+                <td>karoz@example.com</td>
+                <td>Engineering</td>
+                <td>Employee</td>
+                <td>John Doe</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Today, 09:15 AM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">DM</div>
+                    <div>David Miller</div>
+                  </div>
+                </td>
+                <td>david@example.com</td>
+                <td>Finance</td>
+                <td>Director</td>
+                <td>-</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Today, 11:30 AM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">AF</div>
+                    <div>Aland Fryad</div>
+                  </div>
+                </td>
+                <td>aland@example.com</td>
+                <td>Sales</td>
+                <td>Employee</td>
+                <td>Jennifer Wilson</td>
+                <td><span class="status status-pending">Pending</span></td>
+                <td>Never</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">JW</div>
+                    <div>Jennifer Wilson</div>
+                  </div>
+                </td>
+                <td>jennifer@example.com</td>
+                <td>Sales</td>
+                <td>Manager</td>
+                <td>Rawa Dara</td>
+                <td><span class="status status-approved">Active</span></td>
+                <td>Yesterday, 16:45 PM</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="user-select"></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar">TJ</div>
+                    <div>Tom Johnson</div>
+                  </div>
+                </td>
+                <td>tom@example.com</td>
+                <td>Engineering</td>
+                <td>Employee</td>
+                <td>John Doe</td>
+                <td><span class="status status-rejected">Inactive</span></td>
+                <td>Feb 15, 2025</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-key"></i></a>
+                    <a href="#" class="table-action-btn"><i class="fas fa-envelope"></i></a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-3 mb-3" style="display: flex; justify-content: space-between; align-items: center; padding: 0 1rem;">
+          <div>
+            <span>With selected:</span>
+            <select id="bulk-action">
+              <option value="">-- Select Action --</option>
+              <option value="activate">Activate</option>
+              <option value="deactivate">Deactivate</option>
+              <option value="reset-password">Reset Password</option>
+              <option value="delete">Delete</option>
+              <option value="export">Export</option>
+            </select>
+            <button type="button" class="btn">Apply</button>
+          </div>
+          
+          <div>
+            <button type="button" class="btn-sm"><i class="fas fa-chevron-left"></i> Previous</button>
+            <span>Page 1 of 4</span>
+            <button type="button" class="btn-sm">Next <i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- User Stats -->
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-chart-pie"></i> User Statistics</h2>
+      </div>
+      
+      <div class="stats-container">
+        <div class="stat-card">
+          <h3>Users by Role</h3>
+          <div style="height: 180px; display: flex; align-items: flex-end; justify-content: center; gap: 30px; padding: 10px 10px 20px 10px;">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 60px;">
+              <div style="height: 80px; width: 40px; background-color: var(--info-color); border-radius: 3px 3px 0 0;"></div>
+              <div style="text-align: center; margin-top: 8px; font-size: 0.85em; width: 100%;">Admin<br>(5)</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 60px;">
+              <div style="height: 40px; width: 40px; background-color: var(--success-color); border-radius: 3px 3px 0 0;"></div>
+              <div style="text-align: center; margin-top: 8px; font-size: 0.85em; width: 100%;">Manager<br>(8)</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 60px;">
+              <div style="height: 110px; width: 40px; background-color: var(--warning-color); border-radius: 3px 3px 0 0;"></div>
+              <div style="text-align: center; margin-top: 8px; font-size: 0.85em; width: 100%;">Employee<br>(22)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Department Distribution</h3>
+          <ul style="list-style-type: none; padding: 0; margin: 15px 0;">
+            <li style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+              <span style="width: 80px;">Engineering</span>
+              <div style="width: 60%; background-color: #f1f1f1; height: 12px; border-radius: 3px; overflow: hidden; margin: 0 10px;">
+                <div style="background-color: var(--info-color); height: 100%; width: 35%;"></div>
+              </div>
+              <span style="width: 20px; text-align: right;">12</span>
+            </li>
+            <li style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+              <span style="width: 80px;">Marketing</span>
+              <div style="width: 60%; background-color: #f1f1f1; height: 12px; border-radius: 3px; overflow: hidden; margin: 0 10px;">
+                <div style="background-color: var(--info-color); height: 100%; width: 18%;"></div>
+              </div>
+              <span style="width: 20px; text-align: right;">6</span>
+            </li>
+            <li style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+              <span style="width: 80px;">Finance</span>
+              <div style="width: 60%; background-color: #f1f1f1; height: 12px; border-radius: 3px; overflow: hidden; margin: 0 10px;">
+                <div style="background-color: var(--info-color); height: 100%; width: 24%;"></div>
+              </div>
+              <span style="width: 20px; text-align: right;">8</span>
+            </li>
+            <li style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+              <span style="width: 80px;">Sales</span>
+              <div style="width: 60%; background-color: #f1f1f1; height: 12px; border-radius: 3px; overflow: hidden; margin: 0 10px;">
+                <div style="background-color: var(--info-color); height: 100%; width: 15%;"></div>
+              </div>
+              <span style="width: 20px; text-align: right;">5</span>
+            </li>
+            <li style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="width: 80px;">HR</span>
+              <div style="width: 60%; background-color: #f1f1f1; height: 12px; border-radius: 3px; overflow: hidden; margin: 0 10px;">
+                <div style="background-color: var(--info-color); height: 100%; width: 12%;"></div>
+              </div>
+              <span style="width: 20px; text-align: right;">4</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="stat-card">
+          <h3>User Status</h3>
+          <div style="display: flex; flex-direction: column; align-items: center; padding: 0; height: 190px;">
+            <!-- Solid pie chart with shadow for definition -->
+            <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; margin: 10px 0; 
+                 background: conic-gradient(var(--success-color) 0% 85%, var(--warning-color) 85% 90%, var(--danger-color) 90% 100%);
+                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            </div>
+            
+            <!-- Legend with better spacing -->
+            <div style="width: 80%; margin-top: 15px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-left: 20px;">
+                <div style="width: 12px; height: 12px; background-color: var(--success-color); border-radius: 2px;"></div>
+                <span>Active (30)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-left: 20px;">
+                <div style="width: 12px; height: 12px; background-color: var(--warning-color); border-radius: 2px;"></div>
+                <span>Pending (2)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; padding-left: 20px;">
+                <div style="width: 12px; height: 12px; background-color: var(--danger-color); border-radius: 2px;"></div>
+                <span>Inactive (3)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Recent Activity</h3>
+          <ul class="activity-list" style="padding: 0 10px; margin: 10px 0;">
+            <li style="margin-bottom: 8px; display: flex; align-items: flex-start;">
+              <i class="fas fa-user-plus" style="margin-right: 8px; margin-top: 3px;"></i>
+              <div style="flex-grow: 1;">
+                <span>New user created: <b>Aland Fryad</b></span>
+                <small style="display: block;">Today, 08:30 AM</small>
+              </div>
+            </li>
+            <li style="margin-bottom: 8px; display: flex; align-items: flex-start;">
+              <i class="fas fa-user-edit" style="margin-right: 8px; margin-top: 3px;"></i>
+              <div style="flex-grow: 1;">
+                <span>User modified: <b>Karoz Fryad</b></span>
+                <small style="display: block;">Yesterday, 14:35 PM</small>
+              </div>
+            </li>
+            <li style="margin-bottom: 8px; display: flex; align-items: flex-start;">
+              <i class="fas fa-key" style="margin-right: 8px; margin-top: 3px;"></i>
+              <div style="flex-grow: 1;">
+                <span>Password reset: <b>Michael Brown</b></span>
+                <small style="display: block;">Yesterday, 11:20 AM</small>
+              </div>
+            </li>
+            <li style="display: flex; align-items: flex-start;">
+              <i class="fas fa-user-times" style="margin-right: 8px; margin-top: 3px;"></i>
+              <div style="flex-grow: 1;">
+                <span>User deactivated: <b>Tom Johnson</b></span>
+                <small style="display: block;">Feb 15, 2025</small>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p>KurdLeave System &copy; 2025</p>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back to Top button functionality
+      const backToTopButton = document.getElementById('backToTop');
+      
+      // Show/hide button based on scroll position
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.add('show');
+        } else {
+          backToTopButton.classList.remove('show');
+        }
+      });
+      
+      // Scroll to top when clicked
+      backToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // Select all functionality
+      const selectAllCheckbox = document.getElementById('select-all');
+      const userCheckboxes = document.querySelectorAll('.user-select');
+      
+      selectAllCheckbox.addEventListener('change', function() {
+        userCheckboxes.forEach(checkbox => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
