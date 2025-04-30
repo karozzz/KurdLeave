@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KurdLeave — Admin Leave Management</title>
+  <link rel="stylesheet" href="../admincss/admin-styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Remove underlines from all links */
+    a {
+      text-decoration: none;
+    }
+    
+    /* Specifically target table action buttons */
+    .table-action-btn {
+      text-decoration: none;
+    }
+    
+    /* Remove underlines from navigation links */
+    .main-header a {
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Main Header -->
+    <table class="main-header">
+      <tr>
+        <td colspan="7">
+          <h1>KurdLeave System - ADMIN PANEL</h1>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="admin_dashboard.html"><i class="fas fa-home"></i> Admin Home</a></td>
+        <td><b><a href="admin_leaves.html"><i class="fas fa-calendar-alt"></i> Leave Management</a></b></td>
+        <td><a href="admin_users.html"><i class="fas fa-users"></i> User Management</a></td>
+        <td><a href="admin_reports.html"><i class="fas fa-chart-bar"></i> Reports</a></td>
+        <td><a href="admin_settings.html"><i class="fas fa-cog"></i> System Settings</a></td>
+        <td><a href="admin_logs.html"><i class="fas fa-history"></i> Activity Logs</a></td>
+        <td><a href="../user/login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></td>
+      </tr>
+    </table>
+    
+    <!-- Leave Types and Policy Configuration -->
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-list-ul"></i> Leave Types and Policy Configuration</h2>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Leave Type</th>
+            <th>Default Annual Allocation</th>
+            <th>Carry Forward Limit</th>
+            <th>Minimum Notice (Days)</th>
+            <th>Requires Documentation</th>
+            <th>Applies To</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Annual Leave</td>
+            <td class="text-center">20 days</td>
+            <td class="text-center">5 days</td>
+            <td class="text-center">7</td>
+            <td class="text-center">No</td>
+            <td>All Employees</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td>Sick Leave</td>
+            <td class="text-center">12 days</td>
+            <td class="text-center">0 days</td>
+            <td class="text-center">0</td>
+            <td class="text-center">Yes (>2 days)</td>
+            <td>All Employees</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td>Personal Days</td>
+            <td class="text-center">4 days</td>
+            <td class="text-center">0 days</td>
+            <td class="text-center">1</td>
+            <td class="text-center">No</td>
+            <td>All Employees</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td>Bereavement Leave</td>
+            <td class="text-center">5 days</td>
+            <td class="text-center">0 days</td>
+            <td class="text-center">0</td>
+            <td class="text-center">Optional</td>
+            <td>All Employees</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td>Study Leave</td>
+            <td class="text-center">10 days</td>
+            <td class="text-center">0 days</td>
+            <td class="text-center">14</td>
+            <td class="text-center">Yes</td>
+            <td>Full-time</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td>Parental Leave</td>
+            <td class="text-center">As per policy</td>
+            <td class="text-center">0 days</td>
+            <td class="text-center">30</td>
+            <td class="text-center">Yes</td>
+            <td>All Employees (>1 year)</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td>Unpaid Leave</td>
+            <td class="text-center">Unlimited</td>
+            <td class="text-center">0 days</td>
+            <td class="text-center">14</td>
+            <td class="text-center">Optional</td>
+            <td>All Employees</td>
+            <td class="text-center"><span class="status status-approved">Active</span></td>
+            <td class="text-center"><a href="#" class="table-action-btn">Edit</a>&nbsp;&nbsp;<a href="#" class="table-action-btn">Deactivate</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Add New Leave Type Form -->
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-plus-circle"></i> Add New Leave Type</h2>
+      </div>
+      
+      <form action="#" method="post" class="form-grid">
+        <div>
+          <label for="leave-type">Leave Type Name:</label>
+          <input type="text" id="leave-type" name="leave_type" required>
+        </div>
+        
+        <div>
+          <label for="allocation">Default Annual Allocation:</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="number" id="allocation" name="allocation" min="0" max="365" required style="flex: 2;">
+            <select name="allocation_unit" style="flex: 1;">
+              <option value="days">Days</option>
+              <option value="hours">Hours</option>
+            </select>
+          </div>
+        </div>
+        
+        <div>
+          <label for="carry-forward">Carry Forward Limit:</label>
+          <input type="number" id="carry-forward" name="carry_forward" min="0" max="365" value="0">
+        </div>
+        
+        <div>
+          <label for="notice">Minimum Notice (Days):</label>
+          <input type="number" id="notice" name="notice" min="0" max="90" value="0">
+        </div>
+        
+        <div>
+          <label for="documentation">Requires Documentation:</label>
+          <select id="documentation" name="documentation">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+            <option value="conditional">Conditional</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="applies-to">Applies To:</label>
+          <select id="applies-to" name="applies_to">
+            <option value="all">All Employees</option>
+            <option value="full-time">Full-time Only</option>
+            <option value="part-time">Part-time Only</option>
+            <option value="contract">Contract Only</option>
+            <option value="custom">Custom...</option>
+          </select>
+        </div>
+        
+        <div class="grid-span-2">
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        
+        <div>
+          <label>Allow Half-Day:</label>
+          <div>
+            <input type="radio" id="half-day-yes" name="half_day" value="yes" checked>
+            <label for="half-day-yes">Yes</label>
+            <input type="radio" id="half-day-no" name="half_day" value="no">
+            <label for="half-day-no">No</label>
+          </div>
+        </div>
+        
+        <div>
+          <label>Status:</label>
+          <div>
+            <input type="radio" id="status-active" name="status" value="active" checked>
+            <label for="status-active">Active</label>
+            <input type="radio" id="status-inactive" name="status" value="inactive">
+            <label for="status-inactive">Inactive</label>
+          </div>
+        </div>
+        
+        <div class="grid-span-2 text-center mt-2">
+          <button type="submit" class="btn-success"><i class="fas fa-plus-circle"></i> Add Leave Type</button>
+          <button type="reset" class="btn-danger"><i class="fas fa-times-circle"></i> Clear Form</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Holiday Calendar Management -->
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-calendar"></i> Holiday Calendar Management</h2>
+      </div>
+      
+      <h3>Upcoming Holidays</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Holiday Name</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Applies To</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Memorial Day</td>
+            <td>May 26, 2025</td>
+            <td>Public Holiday</td>
+            <td>All Locations</td>
+            <td><a href="#" class="table-action-btn">Edit</a> <a href="#" class="table-action-btn">Delete</a></td>
+          </tr>
+          <tr>
+            <td>Independence Day</td>
+            <td>July 4, 2025</td>
+            <td>Public Holiday</td>
+            <td>All Locations</td>
+            <td><a href="#" class="table-action-btn">Edit</a> <a href="#" class="table-action-btn">Delete</a></td>
+          </tr>
+          <tr>
+            <td>Labor Day</td>
+            <td>September 1, 2025</td>
+            <td>Public Holiday</td>
+            <td>All Locations</td>
+            <td><a href="#" class="table-action-btn">Edit</a> <a href="#" class="table-action-btn">Delete</a></td>
+          </tr>
+          <tr>
+            <td>Company Foundation Day</td>
+            <td>October 15, 2025</td>
+            <td>Company Holiday</td>
+            <td>All Locations</td>
+            <td><a href="#" class="table-action-btn">Edit</a> <a href="#" class="table-action-btn">Delete</a></td>
+          </tr>
+          <tr>
+            <td>Thanksgiving Day</td>
+            <td>November 27, 2025</td>
+            <td>Public Holiday</td>
+            <td>United States</td>
+            <td><a href="#" class="table-action-btn">Edit</a> <a href="#" class="table-action-btn">Delete</a></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Add New Holiday Form -->
+      <div class="card mt-3">
+        <div class="card-header"><i class="fas fa-plus-circle"></i> Add New Holiday</div>
+        <form action="#" method="post" class="form-grid mt-2">
+          <div>
+            <label for="holiday-name">Holiday Name:</label>
+            <input type="text" id="holiday-name" name="holiday_name" required>
+          </div>
+          
+          <div>
+            <label for="holiday-date">Date:</label>
+            <input type="date" id="holiday-date" name="holiday_date" required>
+          </div>
+          
+          <div>
+            <label for="holiday-type">Type:</label>
+            <select id="holiday-type" name="holiday_type">
+              <option value="public">Public Holiday</option>
+              <option value="company">Company Holiday</option>
+              <option value="optional">Optional Holiday</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="holiday-location">Applies To:</label>
+            <select id="holiday-location" name="holiday_location">
+              <option value="all">All Locations</option>
+              <option value="us">United States</option>
+              <option value="uk">United Kingdom</option>
+              <option value="india">India</option>
+              <option value="australia">Australia</option>
+            </select>
+          </div>
+          
+          <div class="grid-span-2">
+            <label for="holiday-description">Description:</label>
+            <textarea id="holiday-description" name="holiday_description" rows="2"></textarea>
+          </div>
+          
+          <div class="grid-span-2 text-center mt-2">
+            <button type="submit" class="btn-success"><i class="fas fa-plus-circle"></i> Add Holiday</button>
+            <button type="reset" class="btn-danger"><i class="fas fa-times-circle"></i> Clear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Leave Policy Settings -->
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-cogs"></i> Leave Policy Settings</h2>
+      </div>
+      
+      <form action="#" method="post">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th colspan="2">Global Settings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><label for="leave-cycle">Leave Cycle</label></td>
+              <td>
+                <select id="leave-cycle" name="leave_cycle">
+                  <option value="calendar">Calendar Year (Jan-Dec)</option>
+                  <option value="financial">Financial Year (Apr-Mar)</option>
+                  <option value="anniversary">Employee Anniversary</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="approval-flow">Approval Workflow</label></td>
+              <td>
+                <select id="approval-flow" name="approval_flow">
+                  <option value="manager">Manager Only</option>
+                  <option value="manager-hr">Manager Then HR</option>
+                  <option value="manager-dept">Manager Then Department Head</option>
+                  <option value="custom">Custom Workflow</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="weekend-days">Weekend Days</label></td>
+              <td>
+                <input type="checkbox" id="weekend-mon" name="weekend[]" value="mon">
+                <label for="weekend-mon">Monday</label>
+                <input type="checkbox" id="weekend-tue" name="weekend[]" value="tue">
+                <label for="weekend-tue">Tuesday</label>
+                <input type="checkbox" id="weekend-wed" name="weekend[]" value="wed">
+                <label for="weekend-wed">Wednesday</label>
+                <input type="checkbox" id="weekend-thu" name="weekend[]" value="thu">
+                <label for="weekend-thu">Thursday</label>
+                <input type="checkbox" id="weekend-fri" name="weekend[]" value="fri">
+                <label for="weekend-fri">Friday</label>
+                <input type="checkbox" id="weekend-sat" name="weekend[]" value="sat" checked>
+                <label for="weekend-sat">Saturday</label>
+                <input type="checkbox" id="weekend-sun" name="weekend[]" value="sun" checked>
+                <label for="weekend-sun">Sunday</label>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="probation">Probation Period (Days)</label></td>
+              <td>
+                <input type="number" id="probation" name="probation" min="0" max="365" value="90">
+                <small>(Employees can only apply for leave after this period)</small>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="pro-rata">Pro-rata Leave Calculation</label></td>
+              <td>
+                <input type="radio" id="pro-rata-yes" name="pro_rata" value="yes" checked>
+                <label for="pro-rata-yes">Yes</label>
+                <input type="radio" id="pro-rata-no" name="pro_rata" value="no">
+                <label for="pro-rata-no">No</label>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="encashment">Allow Leave Encashment</label></td>
+              <td>
+                <input type="radio" id="encashment-yes" name="encashment" value="yes">
+                <label for="encashment-yes">Yes</label>
+                <input type="radio" id="encashment-no" name="encashment" value="no" checked>
+                <label for="encashment-no">No</label>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-center">
+                <button type="submit" class="btn-success"><i class="fas fa-save"></i> Save Policy Settings</button>
+                <button type="reset" class="btn-danger"><i class="fas fa-undo"></i> Reset to Defaults</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+    
+    <!-- Leave Request Review Section -->
+    <div class="content-panel">
+      <div class="panel-heading text-center">
+        <h2><i class="fas fa-clipboard-check"></i> Leave Request Review</h2>
+        <p>Today is <b>April 30, 2025</b> (Wednesday)</p>
+      </div>
+      
+      <!-- Leave Request Details -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3><i class="fas fa-info-circle"></i> Leave Request #L125</h3>
+        </div>
+        
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th width="20%">Request Information</th>
+              <th width="80%">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Employee:</td>
+              <td>
+                <b>Michael Brown</b> (ID: EMP-0023)<br>
+                Email: michael@example.com<br>
+                Phone: (555) 123-4567
+              </td>
+            </tr>
+            <tr>
+              <td>Department:</td>
+              <td>Engineering</td>
+            </tr>
+            <tr>
+              <td>Position:</td>
+              <td>Senior Developer</td>
+            </tr>
+            <tr>
+              <td>Manager:</td>
+              <td>Rawa Dara (rawa@example.com)</td>
+            </tr>
+            <tr>
+              <td>Leave Type:</td>
+              <td>Annual Leave</td>
+            </tr>
+            <tr>
+              <td>Leave Period:</td>
+              <td>
+                <b>Start Date:</b> May 10, 2025 (Saturday)<br>
+                <b>End Date:</b> May 15, 2025 (Thursday)<br>
+                <b>Total Days:</b> 6 days (4 working days)
+              </td>
+            </tr>
+            <tr>
+              <td>Reason:</td>
+              <td>Family vacation</td>
+            </tr>
+            <tr>
+              <td>Submission Date:</td>
+              <td>April 27, 2025 (08:45 AM)</td>
+            </tr>
+            <tr>
+              <td>Status:</td>
+              <td><span class="status status-approved">Approved</span></td>
+            </tr>
+            <tr>
+              <td>Contact While Away:</td>
+              <td>
+                Via email only for emergencies<br>
+                Personal email: michael.brown@personalemail.com
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Leave Balance -->
+        <div>
+          <h3><i class="fas fa-balance-scale"></i> Leave Balance</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Leave Type</th>
+                <th>Available</th>
+                <th>Used (YTD)</th>
+                <th>Pending</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Annual Leave</td>
+                <td class="text-center">15 days</td>
+                <td class="text-center">5 days</td>
+                <td class="text-center">0 days</td>
+              </tr>
+              <tr>
+                <td>Sick Leave</td>
+                <td class="text-center">12 days</td>
+                <td class="text-center">2 days</td>
+                <td class="text-center">0 days</td>
+              </tr>
+              <tr>
+                <td>Personal Days</td>
+                <td class="text-center">3 days</td>
+                <td class="text-center">0 days</td>
+                <td class="text-center">0 days</td>
+              </tr>
+              <tr>
+                <td>Special Leave</td>
+                <td class="text-center">5 days</td>
+                <td class="text-center">0 days</td>
+                <td class="text-center">0 days</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <h3 class="mt-3"><i class="fas fa-history"></i> Leave History (Last 12 Months)</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dates</th>
+                <th>Type</th>
+                <th>Duration</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Feb 12-16, 2025</td>
+                <td>Annual Leave</td>
+                <td class="text-center">5 days</td>
+                <td><span class="status status-approved">Approved</span></td>
+              </tr>
+              <tr>
+                <td>Jan 8-9, 2025</td>
+                <td>Sick Leave</td>
+                <td class="text-center">2 days</td>
+                <td><span class="status status-approved">Approved</span></td>
+              </tr>
+              <tr>
+                <td>Nov 22-26, 2024</td>
+                <td>Annual Leave</td>
+                <td class="text-center">5 days</td>
+                <td><span class="status status-approved">Approved</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Department Calendar and Coverage Plan -->
+        <div>
+          <h3><i class="fas fa-calendar-alt"></i> Department Leave Calendar (May 2025)</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>May 1-5</th>
+                <th>May 6-10</th>
+                <th>May 11-15</th>
+                <th>May 16-20</th>
+                <th>May 21-25</th>
+                <th>May 26-31</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Michael Brown</td>
+                <td></td>
+                <td class="approved-leave">May 10</td>
+                <td class="approved-leave">May 11-15</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Jane Wilson</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="rejected-leave">May 22-24</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Ahmed Hassan</td>
+                <td class="approved-leave">May 1-3</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Lisa Chen</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="approved-leave">May 29-31</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="mt-1"><b>Legend:</b> 
+            <span class="pending-leave" style="padding: 2px 8px;">Pending</span> 
+            <span class="approved-leave" style="padding: 2px 8px;">Approved</span> 
+            <span class="rejected-leave" style="padding: 2px 8px;">Important Dates</span>
+          </p>
+          
+          <h3 class="mt-3"><i class="fas fa-tasks"></i> Work Coverage Plan</h3>
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <td width="30%">Work Handover To:</td>
+                <td width="70%">Jane Wilson (jane@example.com)</td>
+              </tr>
+              <tr>
+                <td>Current Projects:</td>
+                <td>
+                  - Customer Portal Update (deadline: June 10)<br>
+                  - Bug fixes for release 2.5 (priority: medium)
+                </td>
+              </tr>
+              <tr>
+                <td>Critical Responsibilities:</td>
+                <td>
+                  - Daily system monitoring (assigned to: Ahmed)<br>
+                  - Weekly team status report (assigned to: Jane)
+                </td>
+              </tr>
+              <tr>
+                <td>Handover Notes:</td>
+                <td>Detailed handover document has been prepared and shared with the team. All current tasks have been documented in Jira tickets.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Comments and Admin Review -->
+    <div class="content-panel">
+      <h3><i class="fas fa-comments"></i> Manager Comments</h3>
+      <div class="alert alert-info">
+        <p>
+          <b>Rawa Dara</b> (April 27, 2025 09:10 AM):<br>
+          "I approve Michael's leave request. He has completed all pending tasks and arranged appropriate handover."
+        </p>
+      </div>
+      
+      <h3><i class="fas fa-clipboard-check"></i> Admin Review</h3>
+      <form>
+        <div class="form-grid">
+          <div class="grid-span-2">
+            <label>Decision:</label>
+            <div>
+              <input type="radio" name="decision" id="decision-approve" value="approve" checked>
+              <label for="decision-approve">Approve</label>
+              <input type="radio" name="decision" id="decision-reject" value="reject">
+              <label for="decision-reject">Reject</label>
+              <input type="radio" name="decision" id="decision-pending" value="pending">
+              <label for="decision-pending">Keep Pending</label>
+            </div>
+          </div>
+          
+          <div class="grid-span-2">
+            <label>Comments:</label>
+            <textarea rows="4" placeholder="Add your comments or notes regarding this leave request..."></textarea>
+          </div>
+          
+          <div class="grid-span-2 text-center mt-2">
+            <button type="submit" class="btn-success">Submit Decision</button>
+            <button type="reset" class="btn-danger">Clear</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p>KurdLeave System &copy; 2025 | <a href="#">Admin Help</a> | <a href="#">System Support</a></p>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+  
+  <!-- Dark Mode Toggle -->
+  <button class="dark-mode-toggle" id="darkModeToggle">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back to Top button functionality
+      const backToTopButton = document.getElementById('backToTop');
+      
+      // Show/hide button based on scroll position
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.add('show');
+        } else {
+          backToTopButton.classList.remove('show');
+        }
+      });
+      
+      // Scroll to top when clicked
+      backToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      
+      // Check if user already has a preference
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+      }
+      
+      darkModeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        
+        // Save preference to localStorage
+        if (document.body.classList.contains('dark-mode')) {
+          localStorage.setItem('darkMode', 'enabled');
+        } else {
+          localStorage.setItem('darkMode', null);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
