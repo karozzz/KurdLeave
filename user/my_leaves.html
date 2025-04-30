@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KurdLeave — My Leaves</title>
+  <link rel="stylesheet" href="../usercss/user-styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header & Navigation -->
+    <table class="main-header">
+      <tr>
+        <td colspan="7">
+          <h1>KurdLeave System</h1>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="home.html"><i class="fas fa-home"></i> Home</a></td>
+        <td><a href="apply_leave.html"><i class="fas fa-plus-circle"></i> Apply Leave</a></td>
+        <td><b><a href="my_leaves.html"><i class="fas fa-list-check"></i> My Leaves</a></b></td>
+        <td><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></td>
+        <td><a href="profile.html"><i class="fas fa-user"></i> Profile</a></td>
+      
+        <td><a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></td>
+      </tr>
+    </table>
+    
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-list-check"></i> My Leave Applications</h2>
+      </div>
+      
+      <!-- Search and Filter -->
+      <fieldset>
+        <legend>Search and Filter</legend>
+        <form action="#" method="get">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+            <div>
+              <label for="status-filter">Status:</label>
+              <select id="status-filter" name="status">
+                <option value="all">All Statuses</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="type-filter">Leave Type:</label>
+              <select id="type-filter" name="type">
+                <option value="all">All Types</option>
+                <option value="annual">Annual Leave</option>
+                <option value="sick">Sick Leave</option>
+                <option value="personal">Personal Days</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="date-from">From:</label>
+              <input type="date" id="date-from" name="from">
+            </div>
+            
+            <div>
+              <label for="date-to">To:</label>
+              <input type="date" id="date-to" name="to">
+            </div>
+            
+            <div>
+              <button type="submit" class="btn"><i class="fas fa-filter"></i> Apply Filters</button>
+              <button type="reset" class="btn"><i class="fas fa-undo"></i> Reset</button>
+            </div>
+          </div>
+        </form>
+      </fieldset>
+      
+      <!-- My Leaves Table -->
+      <h3 class="mt-3"><i class="fas fa-calendar-day"></i> Leave Applications</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Application ID</th>
+            <th>Leave Type</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Duration</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Approver</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="approved-leave">
+            <td>L-2025-001</td>
+            <td>Sick Leave</td>
+            <td>2025-05-01</td>
+            <td>2025-05-03</td>
+            <td>3 days</td>
+            <td>Medical appointment and recovery</td>
+            <td><span class="status status-approved">Approved</span></td>
+            <td>Karoz Rebaz</td>
+            <td><a href="#" class="table-action-btn"><i class="fas fa-eye"></i> View</a></td>
+          </tr>
+          <tr class="pending-leave">
+            <td>L-2025-002</td>
+            <td>Annual Leave</td>
+            <td>2025-07-15</td>
+            <td>2025-07-20</td>
+            <td>6 days</td>
+            <td>Family vacation</td>
+            <td><span class="status status-pending">Pending</span></td>
+            <td>-</td>
+            <td>
+              <a href="#" class="table-action-btn"><i class="fas fa-eye"></i> View</a>
+              <a href="#" class="table-action-btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
+            </td>
+          </tr>
+          <tr class="rejected-leave">
+            <td>L-2025-003</td>
+            <td>Personal Day</td>
+            <td>2025-06-10</td>
+            <td>2025-06-10</td>
+            <td>1 day</td>
+            <td>Personal matters</td>
+            <td><span class="status status-rejected">Rejected</span></td>
+            <td>Karoz Rebaz</td>
+            <td>
+              <a href="#" class="table-action-btn"><i class="fas fa-eye"></i> View</a>
+              <a href="#" class="table-action-btn"><i class="fas fa-sync"></i> Reapply</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Leave Balance Summary -->
+    <div class="content-panel">
+      <h2><i class="fas fa-chart-pie"></i> Leave Balance Summary</h2>
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-label">Annual Leave</div>
+          <div class="stat-value">9/20</div>
+          <small>9 days remaining</small>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Sick Leave</div>
+          <div class="stat-value">9/12</div>
+          <small>9 days remaining</small>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Personal Days</div>
+          <div class="stat-value">3/4</div>
+          <small>3 days remaining</small>
+        </div>
+      </div>
+      
+      <table class="mt-3">
+        <thead>
+          <tr>
+            <th>Leave Type</th>
+            <th>Total Allocation</th>
+            <th>Used</th>
+            <th>Pending</th>
+            <th>Remaining</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Annual Leave</td>
+            <td>20 days</td>
+            <td>5 days</td>
+            <td>6 days</td>
+            <td>9 days</td>
+          </tr>
+          <tr>
+            <td>Sick Leave</td>
+            <td>12 days</td>
+            <td>3 days</td>
+            <td>0 days</td>
+            <td>9 days</td>
+          </tr>
+          <tr>
+            <td>Personal Days</td>
+            <td>4 days</td>
+            <td>1 day</td>
+            <td>0 days</td>
+            <td>3 days</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Upload Supporting Documents -->
+    <div class="content-panel">
+      <h2><i class="fas fa-file-upload"></i> Upload Supporting Documents</h2>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Supporting documents may be required for certain leave types (e.g., medical certificates for sick leave).
+      </div>
+      
+      <form action="#" method="post" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+          <div>
+            <label for="leave-id">Leave Application ID:</label>
+            <select id="leave-id" name="leave_id" required>
+              <option value="">-- Select Application --</option>
+              <option value="L-2025-001">L-2025-001 (Sick Leave)</option>
+              <option value="L-2025-002">L-2025-002 (Annual Leave)</option>
+              <option value="L-2025-003">L-2025-003 (Personal Day)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="document">Select Document:</label>
+            <input type="file" id="document" name="document" required>
+          </div>
+          
+          <div>
+            <label for="doc-type">Document Type:</label>
+            <select id="doc-type" name="doc_type" required>
+              <option value="">-- Select Document Type --</option>
+              <option value="medical">Medical Certificate</option>
+              <option value="travel">Travel Documents</option>
+              <option value="other">Other Supporting Document</option>
+            </select>
+          </div>
+          
+          <div>
+            <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Upload Document</button>
+          </div>
+        </div>
+      </form>
+      
+      <h3 class="mt-3">Uploaded Documents</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Leave ID</th>
+            <th>Document Name</th>
+            <th>Type</th>
+            <th>Upload Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>L-2025-001</td>
+            <td>Medical_Certificate.pdf</td>
+            <td>Medical Certificate</td>
+            <td>2025-04-25</td>
+            <td>
+              <a href="#" class="table-action-btn"><i class="fas fa-download"></i> Download</a>
+              <a href="#" class="table-action-btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p>KurdLeave System &copy; 2025</p>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back to Top button functionality
+      const backToTopButton = document.getElementById('backToTop');
+      
+      // Show/hide button based on scroll position
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.add('show');
+        } else {
+          backToTopButton.classList.remove('show');
+        }
+      });
+      
+      // Scroll to top when clicked
+      backToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
