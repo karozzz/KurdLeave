@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KurdLeave — Admin Dashboard</title>
+  <link rel="stylesheet" href="../admincss/admin-styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Main Header -->
+    <table class="main-header">
+      <tr>
+        <td colspan="7">
+          <h1>KurdLeave System - ADMIN PANEL</h1>
+        </td>
+      </tr>
+      <tr>
+        <td><b><a href="admin_dashboard.html"><i class="fas fa-home"></i> Admin Home</a></b></td>
+        <td><a href="admin_leaves.html"><i class="fas fa-calendar-alt"></i> Leave Management</a></td>
+        <td><a href="admin_users.html"><i class="fas fa-users"></i> User Management</a></td>
+        <td><a href="admin_reports.html"><i class="fas fa-chart-bar"></i> Reports</a></td>
+        <td><a href="admin_settings.html"><i class="fas fa-cog"></i> System Settings</a></td>
+        <td><a href="admin_logs.html"><i class="fas fa-history"></i> Activity Logs</a></td>
+        <td><a href="../user/login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></td>
+      </tr>
+    </table>
+    
+    <!-- Welcome Panel -->
+    <div class="content-panel">
+      <div class="panel-heading text-center">
+        <h2>Welcome, Administrator!</h2>
+        <p>Today is <b>April 28, 2025</b> (Monday)</p>
+      </div>
+      
+      <!-- Dashboard Stats -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-value">42</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">7</div>
+          <div class="stat-label">Pending Leave Requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Users on Leave Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">185</div>
+          <div class="stat-label">Total Leave Days Used</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="content-panel">
+      <h3>Administrative Quick Actions</h3>
+      
+      <div class="card-container" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+        <div class="card" style="flex: 1; min-width: 250px;">
+          <div class="card-header"><i class="fas fa-clipboard-check"></i> Pending Approvals</div>
+          <p>You have <b>7</b> leave requests awaiting approval</p>
+          <button class="btn"><i class="fas fa-eye"></i> Review Requests</button>
+        </div>
+        
+        <div class="card" style="flex: 1; min-width: 250px;">
+          <div class="card-header"><i class="fas fa-user-plus"></i> User Management</div>
+          <p>Add new users or modify existing user accounts</p>
+          <button class="btn"><i class="fas fa-plus-circle"></i> Add New User</button>
+        </div>
+        
+        <div class="card" style="flex: 1; min-width: 250px;">
+          <div class="card-header"><i class="fas fa-calendar-plus"></i> Holiday Management</div>
+          <p>Configure upcoming holidays and special dates</p>
+          <button class="btn"><i class="fas fa-plus-circle"></i> Add Holiday</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="content-panel">
+      <h3><i class="fas fa-history"></i> Recent Activity</h3>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>09:15 AM</td>
+            <td>Karoz Rebaz</td>
+            <td>Login</td>
+            <td>User login successful</td>
+          </tr>
+          <tr>
+            <td>09:10 AM</td>
+            <td>Rawa Dara</td>
+            <td>Leave Approval</td>
+            <td>Approved leave request #L125 for Michael Brown</td>
+          </tr>
+          <tr>
+            <td>08:45 AM</td>
+            <td>Michael Brown</td>
+            <td>Leave Request</td>
+            <td>Submitted new leave request (Annual Leave, May 10-15, 2025)</td>
+          </tr>
+          <tr>
+            <td>08:30 AM</td>
+            <td>Admin</td>
+            <td>User Management</td>
+            <td>Created new user: Aland Fryad (aland@example.com)</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="text-right">
+        <button class="btn"><i class="fas fa-list"></i> View All Activity</button>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p>KurdLeave System &copy; 2025</p>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back to Top button functionality
+      const backToTopButton = document.getElementById('backToTop');
+      
+      // Show/hide button based on scroll position
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.add('show');
+        } else {
+          backToTopButton.classList.remove('show');
+        }
+      });
+      
+      // Scroll to top when clicked
+      backToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
