@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KurdLeave — Apply Leave</title>
+  <link rel="stylesheet" href="../usercss/user-styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header & Navigation -->
+    <table class="main-header">
+      <tr>
+        <td colspan="7">
+          <h1>KurdLeave System</h1>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="home.html"><i class="fas fa-home"></i> Home</a></td>
+        <td><b><a href="apply_leave.html"><i class="fas fa-plus-circle"></i> Apply Leave</a></b></td>
+        <td><a href="my_leaves.html"><i class="fas fa-list-check"></i> My Leaves</a></td>
+        <td><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></td>
+        <td><a href="profile.html"><i class="fas fa-user"></i> Profile</a></td>
+        <td><a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></td>
+      </tr>
+    </table>
+    
+    <div class="content-panel">
+      <div class="panel-heading">
+        <h2><i class="fas fa-calendar-plus"></i> Apply for Leave</h2>
+      </div>
+      
+      <!-- Leave Balance Overview -->
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Use this form to submit a new leave request. All fields marked with an asterisk (*) are required.
+      </div>
+      
+      <h3><i class="fas fa-chart-pie"></i> Leave Balance Overview</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Leave Type</th>
+            <th>Total Allocation</th>
+            <th>Used</th>
+            <th>Pending</th>
+            <th>Available</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Annual Leave</td>
+            <td align="center">20</td>
+            <td align="center">5</td>
+            <td align="center">6</td>
+            <td align="center">9</td>
+          </tr>
+          <tr>
+            <td>Sick Leave</td>
+            <td align="center">12</td>
+            <td align="center">3</td>
+            <td align="center">0</td>
+            <td align="center">9</td>
+          </tr>
+          <tr>
+            <td>Personal Days</td>
+            <td align="center">4</td>
+            <td align="center">1</td>
+            <td align="center">0</td>
+            <td align="center">3</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Leave Application Form -->
+    <div class="content-panel">
+      <h2><i class="fas fa-file-alt"></i> Submit Leave Application</h2>
+      <form action="#" method="post" enctype="multipart/form-data">
+        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div class="form-section">
+            <label for="leave-type">Leave Type: *</label>
+            <select id="leave-type" name="leave_type" required>
+              <option value="">-- Select Leave Type --</option>
+              <option value="annual">Annual Leave</option>
+              <option value="sick">Sick Leave</option>
+              <option value="personal">Personal Day</option>
+              <option value="bereavement">Bereavement Leave</option>
+              <option value="study">Study Leave</option>
+              <option value="unpaid">Unpaid Leave</option>
+            </select>
+          </div>
+          
+          <div class="form-section">
+            <label>Half Day Option:</label>
+            <div>
+              <input type="radio" id="full-day" name="day_option" value="full" checked>
+              <label for="full-day">Full Day</label>
+              <input type="radio" id="first-half" name="day_option" value="first-half">
+              <label for="first-half">First Half</label>
+              <input type="radio" id="second-half" name="day_option" value="second-half">
+              <label for="second-half">Second Half</label>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <label for="start-date">Start Date: *</label>
+            <input type="date" id="start-date" name="start_date" required>
+          </div>
+          
+          <div class="form-section">
+            <label for="end-date">End Date: *</label>
+            <input type="date" id="end-date" name="end_date" required>
+          </div>
+          
+          <div class="form-section">
+            <label for="total-days">Total Days:</label>
+            <input type="text" id="total-days" name="total_days" readonly>
+            <small><i>(Will be calculated automatically)</i></small>
+          </div>
+          
+          <div class="form-section">
+            <label for="contact-during-leave">Contact During Leave:</label>
+            <input type="tel" id="contact-during-leave" name="contact" placeholder="Phone number">
+          </div>
+          
+          <div class="form-section" style="grid-column: span 2;">
+            <label for="reason">Reason: *</label>
+            <textarea id="reason" name="reason" rows="4" required></textarea>
+          </div>
+          
+          <div class="form-section">
+            <label for="handover-to">Handover Tasks To:</label>
+            <select id="handover-to" name="handover">
+              <option value="">-- Select Team Member --</option>
+              <option value="aland">Aland Fryad</option>
+              <option value="karoz">Karoz Rebaz</option>
+              <option value="michael">Zana Karwan</option>
+            </select>
+          </div>
+          
+          <div class="form-section">
+            <label for="supporting-doc">Supporting Documents:</label>
+            <input type="file" id="supporting-doc" name="document" multiple>
+            <small>(For sick leave, please attach medical certificates if available)</small>
+          </div>
+          
+          <div class="form-section" style="grid-column: span 2;">
+            <label for="handover-notes">Handover Notes:</label>
+            <textarea id="handover-notes" name="handover_notes" rows="4"></textarea>
+          </div>
+          
+          <div class="form-section">
+            <label>Notifications:</label>
+            <div>
+              <input type="checkbox" id="notify-manager" name="notify_manager" checked>
+              <label for="notify-manager">Notify Manager</label>
+              <br>
+              <input type="checkbox" id="notify-team" name="notify_team">
+              <label for="notify-team">Notify Team Members</label>
+            </div>
+          </div>
+        </div>
+        
+        <fieldset class="mt-3">
+          <legend>Policy Acknowledgment</legend>
+          <input type="checkbox" id="policy-ack" name="policy_ack" required>
+          <label for="policy-ack">I acknowledge that I have read and understood the company leave policy.</label>
+        </fieldset>
+        
+        <div class="text-center mt-3">
+          <button type="submit" class="btn-success"><i class="fas fa-paper-plane"></i> Submit Application</button>
+          <button type="reset"><i class="fas fa-undo"></i> Clear Form</button>
+          <button type="button" class="btn"><i class="fas fa-save"></i> Save as Draft</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Date Range Calendar Picker -->
+    <div class="content-panel">
+      <h2><i class="fas fa-calendar-alt"></i> Visual Date Selector</h2>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Use this visual calendar to easily select your leave dates.
+      </div>
+      
+      <div class="date-selector-navigation">
+        <div>
+          <button class="btn" id="prev-month-picker"><i class="fas fa-chevron-left"></i> Previous</button>
+        </div>
+        <div>
+          <h3 id="calendar-month-picker">April 2025</h3>
+        </div>
+        <div>
+          <button class="btn" id="next-month-picker">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+      
+      <div class="date-selector-container">
+        <div class="date-selector-calendar">
+          <table class="calendar" id="date-picker-calendar">
+            <thead>
+              <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+              </tr>
+            </thead>
+            <tbody id="date-picker-body">
+              <!-- Calendar will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="date-selector-sidebar">
+          <div class="card">
+            <div class="card-header">Team Availability</div>
+            <div id="team-availability">
+              <p>Select a date range to see team availability</p>
+              <div id="availability-chart" style="display: none;">
+                <div class="capacity-container">
+                  <span>Team Capacity:</span>
+                  <span id="team-capacity">85%</span>
+                </div>
+                <div class="capacity-bar">
+                  <div id="capacity-bar" class="capacity-fill" style="width: 85%"></div>
+                </div>
+                <p class="mt-1" id="availability-message">Good availability during your selected dates</p>
+                
+                <h4 class="mt-2">Team Members on Leave:</h4>
+                <ul id="team-on-leave">
+                  <li>Aland Fryad (10 May - 15 May)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card mt-3">
+            <div class="card-header">Selected Dates</div>
+            <div id="selected-dates">
+              <p>No dates selected</p>
+              <div id="selected-range" style="display: none;">
+                <div class="selected-dates-info">
+                  <span>Start:</span>
+                  <span id="display-start-date">-</span>
+                </div>
+                <div class="selected-dates-info">
+                  <span>End:</span>
+                  <span id="display-end-date">-</span>
+                </div>
+                <div class="selected-dates-info">
+                  <span>Days:</span>
+                  <span id="display-total-days">-</span>
+                </div>
+                <button class="btn btn-success" id="apply-selected-dates">Apply to Form</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="calendar-legend">
+        <div class="legend-item legend-today"><span></span> Today</div>
+        <div class="legend-item legend-selected"><span></span> Selected</div>
+        <div class="legend-item legend-holiday"><span></span> Holiday</div>
+        <div class="legend-item legend-team"><span></span> Team Member Leave</div>
+      </div>
+    </div>
+    
+    <!-- Policy Reminders -->
+    <div class="content-panel">
+      <h3><i class="fas fa-exclamation-circle"></i> Leave Policy Reminders</h3>
+      <ul style="list-style-position: inside;">
+        <li style="padding: 8px 0;">Annual leave requests must be submitted at least 7 days in advance.</li>
+        <li style="padding: 8px 0;">Sick leave for more than 2 consecutive days requires a medical certificate.</li>
+        <li style="padding: 8px 0;">Personal days can be taken with 24-hour notice except in emergencies.</li>
+        <li style="padding: 8px 0;">All leaves are subject to manager approval and business requirements.</li>
+      </ul>
+      
+      <h3 class="mt-3"><i class="fas fa-users"></i> Upcoming Team Leaves</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Team Member</th>
+            <th>Leave Type</th>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aland Fryad</td>
+            <td>Annual Leave</td>
+            <td>2025-05-10</td>
+            <td>2025-05-15</td>
+          </tr>
+          <tr>
+            <td>Rawa Dara</td>
+            <td>Sick Leave</td>
+            <td>2025-05-05</td>
+            <td>2025-05-06</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Bulk Leave Request Feature -->
+    <div class="content-panel">
+      <h2><i class="fas fa-layer-group"></i> Bulk Leave Request</h2>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Use this feature to request multiple leave periods at once. Perfect for planning your entire year's vacation or recurring time off.
+      </div>
+      
+      <form action="#" method="post">
+        <div class="mb-3">
+          <label for="leave-type-bulk"><b>Leave Type:</b></label>
+          <select id="leave-type-bulk" name="leave_type_bulk" required>
+            <option value="">-- Select Leave Type --</option>
+            <option value="annual">Annual Leave</option>
+            <option value="personal">Personal Days</option>
+            <option value="unpaid">Unpaid Leave</option>
+          </select>
+        </div>
+        
+        <table class="data-table mb-3">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Half Day Option</th>
+              <th>Reason</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="bulk-request-container">
+            <tr>
+              <td>1</td>
+              <td><input type="date" name="start_date[]" required></td>
+              <td><input type="date" name="end_date[]" required></td>
+              <td>
+                <select name="half_day[]">
+                  <option value="none">Full Day</option>
+                  <option value="first">First Half (Start Date)</option>
+                  <option value="last">Last Half (End Date)</option>
+                </select>
+              </td>
+              <td><input type="text" name="reason[]" placeholder="Brief reason" required></td>
+              <td><button type="button" class="btn-danger" onclick="this.parentNode.parentNode.remove()"><i class="fas fa-times"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="mb-3">
+          <button type="button" id="add-period" class="btn"><i class="fas fa-plus"></i> Add Another Period</button>
+        </div>
+        
+        <div class="mb-3">
+          <label for="bulk-notes"><b>Additional Notes:</b></label>
+          <textarea id="bulk-notes" name="bulk_notes" rows="3" placeholder="Any additional information about these leave requests"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="handover-bulk"><b>General Handover Plan:</b></label>
+          <textarea id="handover-bulk" name="handover_bulk" rows="3" placeholder="General handover plan for all these leave periods"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="supporting-doc-bulk"><b>Supporting Documents:</b></label>
+          <input type="file" id="supporting-doc-bulk" name="supporting_doc_bulk" multiple>
+          <div><small>You can attach documents that apply to all requests.</small></div>
+        </div>
+        
+        <fieldset class="mb-3">
+          <legend>Manager Notification Options</legend>
+          <div>
+            <input type="radio" id="notify-together" name="notify_option" value="together" checked>
+            <label for="notify-together">Submit all requests together (single notification)</label>
+          </div>
+          <div>
+            <input type="radio" id="notify-separate" name="notify_option" value="separate">
+            <label for="notify-separate">Submit as separate requests (individual notifications)</label>
+          </div>
+        </fieldset>
+        
+        <div class="text-center">
+          <button type="submit" class="btn-success"><i class="fas fa-paper-plane"></i> Submit All Requests</button>
+          <button type="reset" class="btn"><i class="fas fa-undo"></i> Clear Form</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Recurring Leave Pattern Feature -->
+    <div class="content-panel">
+      <h2><i class="fas fa-calendar-alt"></i> Recurring Leave Pattern</h2>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Schedule recurring time off, such as every Friday, first Monday of the month, or specific days each week.
+      </div>
+      
+      <form action="#" method="post">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+          <div>
+            <label for="pattern-type"><b>Pattern Type:</b></label>
+            <select id="pattern-type" name="pattern_type" required>
+              <option value="">-- Select Pattern --</option>
+              <option value="weekly">Weekly (same day each week)</option>
+              <option value="monthly-date">Monthly by date (e.g., 15th of each month)</option>
+              <option value="monthly-day">Monthly by day (e.g., first Monday)</option>
+              <option value="custom">Custom pattern</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="leave-type-pattern"><b>Leave Type:</b></label>
+            <select id="leave-type-pattern" name="leave_type_pattern" required>
+              <option value="">-- Select Leave Type --</option>
+              <option value="annual">Annual Leave</option>
+              <option value="personal">Personal Day</option>
+              <option value="unpaid">Unpaid Leave</option>
+              <option value="wfh">Work From Home</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="weekly-options" class="pattern-option mt-3" style="display: none;">
+          <label><b>Select days:</b></label>
+          <div class="day-selector" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+            <div>
+              <input type="checkbox" id="day-mon" name="day[]" value="monday">
+              <label for="day-mon">Monday</label>
+            </div>
+            <div>
+              <input type="checkbox" id="day-tue" name="day[]" value="tuesday">
+              <label for="day-tue">Tuesday</label>
+            </div>
+            <div>
+              <input type="checkbox" id="day-wed" name="day[]" value="wednesday">
+              <label for="day-wed">Wednesday</label>
+            </div>
+            <div>
+              <input type="checkbox" id="day-thu" name="day[]" value="thursday">
+              <label for="day-thu">Thursday</label>
+            </div>
+            <div>
+              <input type="checkbox" id="day-fri" name="day[]" value="friday">
+              <label for="day-fri">Friday</label>
+            </div>
+          </div>
+        </div>
+        
+        <div id="monthly-date-options" class="pattern-option mt-3" style="display: none;">
+          <label for="month-date"><b>Day of month:</b></label>
+          <select id="month-date" name="month_date">
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+            <!-- Additional options would continue... -->
+            <option value="15">15th</option>
+            <!-- ... -->
+            <option value="28">28th</option>
+            <option value="last">Last day</option>
+          </select>
+        </div>
+        
+        <div id="monthly-day-options" class="pattern-option mt-3" style="display: none;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="month-occurrence" name="month_occurrence">
+              <option value="first">First</option>
+              <option value="second">Second</option>
+              <option value="third">Third</option>
+              <option value="fourth">Fourth</option>
+              <option value="last">Last</option>
+            </select>
+            
+            <select id="month-day" name="month_day">
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mt-3">
+          <label><b>Date Range:</b></label>
+          <div style="display: flex; gap: 15px; margin-top: 10px;">
+            <div>
+              <label for="pattern-start">From:</label>
+              <input type="date" id="pattern-start" name="pattern_start" required>
+            </div>
+            <div>
+              <label for="pattern-end">To:</label>
+              <input type="date" id="pattern-end" name="pattern_end" required>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-3">
+          <label for="pattern-reason"><b>Reason:</b></label>
+          <input type="text" id="pattern-reason" name="pattern_reason" required placeholder="Brief reason for recurring leave">
+        </div>
+        
+        <div class="text-center mt-3">
+          <button type="submit" class="btn-success"><i class="fas fa-calendar-plus"></i> Create Recurring Leave</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p>KurdLeave System &copy; 2025</p>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    // Simple script to calculate days between dates
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back to Top button functionality
+      const backToTopButton = document.getElementById('backToTop');
+      
+      // Show/hide button based on scroll position
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.add('show');
+        } else {
+          backToTopButton.classList.remove('show');
+        }
+      });
+      
+      // Scroll to top when clicked
+      backToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+
+      // Original script continues below
+      const startDate = document.getElementById('start-date');
+      const endDate = document.getElementById('end-date');
+      const totalDays = document.getElementById('total-days');
+      
+      function calculateDays() {
+        if(startDate.value && endDate.value) {
+          const start = new Date(startDate.value);
+          const end = new Date(endDate.value);
+          const diffTime = Math.abs(end - start);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          totalDays.value = diffDays + ' day(s)';
+        }
+      }
+      
+      startDate.addEventListener('change', calculateDays);
+      endDate.addEventListener('change', calculateDays);
+      
+      // Pattern type selector logic
+      const patternType = document.getElementById('pattern-type');
+      if (patternType) {
+        patternType.addEventListener('change', function() {
+          document.querySelectorAll('.pattern-option').forEach(el => el.style.display = 'none');
+          
+          const selected = this.value;
+          if (selected === 'weekly') {
+            document.getElementById('weekly-options').style.display = 'block';
+          } else if (selected === 'monthly-date') {
+            document.getElementById('monthly-date-options').style.display = 'block';
+          } else if (selected === 'monthly-day') {
+            document.getElementById('monthly-day-options').style.display = 'block';
+          }
+        });
+      }
+      
+      // Add period button logic for bulk requests
+      const addPeriodBtn = document.getElementById('add-period');
+      if (addPeriodBtn) {
+        addPeriodBtn.addEventListener('click', function() {
+          const container = document.getElementById('bulk-request-container');
+          const rowCount = container.children.length + 1;
+          
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td>${rowCount}</td>
+            <td><input type="date" name="start_date[]" required></td>
+            <td><input type="date" name="end_date[]" required></td>
+            <td>
+              <select name="half_day[]">
+                <option value="none">Full Day</option>
+                <option value="first">First Half (Start Date)</option>
+                <option value="last">Last Half (End Date)</option>
+              </select>
+            </td>
+            <td><input type="text" name="reason[]" placeholder="Brief reason" required></td>
+            <td><button type="button" class="btn-danger" onclick="this.parentNode.parentNode.remove()"><i class="fas fa-times"></i></button></td>
+          `;
+          
+          container.appendChild(newRow);
+        });
+      }
+
+      // Date Picker Calendar
+      const datePickerBody = document.getElementById('date-picker-body');
+      const calendarMonthPicker = document.getElementById('calendar-month-picker');
+      const prevMonthPickerBtn = document.getElementById('prev-month-picker');
+      const nextMonthPickerBtn = document.getElementById('next-month-picker');
+      const applySelectedDatesBtn = document.getElementById('apply-selected-dates');
+      
+      // Team leave data (mock data)
+      const teamLeaves = [
+        { name: 'Aland Fryad', type: 'Annual', startDate: '2025-05-10', endDate: '2025-05-15' },
+        { name: 'Rawa Dara', type: 'Sick', startDate: '2025-05-05', endDate: '2025-05-06' },
+        { name: 'Zana Karwan', type: 'Personal', startDate: '2025-05-20', endDate: '2025-05-20' },
+      ];
+      
+      // Holidays
+      const holidays = [
+        { date: '2025-05-26', name: 'Memorial Day' },
+        { date: '2025-07-04', name: 'Independence Day' },
+        { date: '2025-09-01', name: 'Labor Day' }
+      ];
+      
+      // Current date and active month/year
+      let today = new Date();
+      let currentPickerMonth = today.getMonth();
+      let currentPickerYear = today.getFullYear();
+      
+      // To store selected dates
+      let selectedStartDate = null;
+      let selectedEndDate = null;
+      let isSelecting = false;
+      
+      // Generate and show calendar
+      function showPickerCalendar(month, year) {
+        // First day of the month
+        const firstDay = new Date(year, month, 1).getDay();
+        // Last day of the month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        // Last day of the previous month
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+        // Update calendar title
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        calendarMonthPicker.textContent = months[month] + " " + year;
+        
+        // Clear the calendar
+        datePickerBody.innerHTML = "";
+        
+        // Create calendar rows and cells
+        let date = 1;
+        let nextMonthDate = 1;
+        
+        // Create calendar cells
+        for (let i = 0; i < 6; i++) {
+          // Create table row
+          const row = document.createElement("tr");
+          
+          // Create cells
+          for (let j = 0; j < 7; j++) {
+            const cell = document.createElement("td");
+            cell.className = "calendar-day";
+            
+            if (i === 0 && j < firstDay) {
+              // Previous month days
+              const prevMonthDay = daysInPrevMonth - (firstDay - j - 1);
+              cell.textContent = prevMonthDay;
+              cell.classList.add("other-month");
+            } 
+            else if (date > daysInMonth) {
+              // Next month days
+              cell.textContent = nextMonthDate;
+              cell.classList.add("other-month");
+              nextMonthDate++;
+            } 
+            else {
+              // Current month days
+              cell.textContent = date;
+              
+              // Check if date is today
+              if (date === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                cell.classList.add("today");
+              }
+              
+              // Create full date string for comparisons
+              const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+              
+              // Check for team leaves
+              for (const leave of teamLeaves) {
+                if (isDateInRange(fullDate, leave.startDate, leave.endDate)) {
+                  cell.classList.add("team-leave");
+                  cell.style.backgroundColor = "rgba(241, 196, 15, 0.1)";
+                  
+                  // Add team member indicator
+                  const teamDot = document.createElement("div");
+                  teamDot.className = "team-dot";
+                  teamDot.title = `${leave.name}: ${leave.type} Leave`;
+                  teamDot.style.width = "6px";
+                  teamDot.style.height = "6px";
+                  teamDot.style.borderRadius = "50%";
+                  teamDot.style.backgroundColor = "#f1c40f";
+                  teamDot.style.margin = "2px auto 0";
+                  cell.appendChild(teamDot);
+                }
+              }
+              
+              // Check for holidays
+              const holidayForDay = holidays.find(holiday => holiday.date === fullDate);
+              if (holidayForDay) {
+                cell.classList.add("holiday");
+                cell.style.backgroundColor = "rgba(231, 76, 60, 0.1)";
+                
+                // Add holiday indicator
+                const holidayDot = document.createElement("div");
+                holidayDot.className = "holiday-dot";
+                holidayDot.title = holidayForDay.name;
+                holidayDot.style.width = "6px";
+                holidayDot.style.height = "6px";
+                holidayDot.style.borderRadius = "50%";
+                holidayDot.style.backgroundColor = "#e74c3c";
+                holidayDot.style.margin = "2px auto 0";
+                cell.appendChild(holidayDot);
+              }
+              
+              // Check if this date is in the selected range
+              if (selectedStartDate && selectedEndDate) {
+                const cellDate = new Date(year, month, date);
+                if (isDateInRange(fullDate, formatDate(selectedStartDate), formatDate(selectedEndDate))) {
+                  cell.classList.add("selected");
+                  cell.style.backgroundColor = "rgba(46, 204, 113, 0.1)";
+                }
+              }
+              
+              // Make cell clickable for selection
+              cell.dataset.date = fullDate;
+              cell.style.cursor = "pointer";
+              
+              cell.addEventListener('click', function() {
+                selectDate(this);
+              });
+              
+              date++;
+            }
+            
+            row.appendChild(cell);
+          }
+          
+          datePickerBody.appendChild(row);
+          
+          // Stop if we've already processed all days of the current month
+          if (date > daysInMonth) {
+            break;
+          }
+        }
+      }
+      
+      // Helper function to format date as YYYY-MM-DD
+      function formatDate(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      }
+      
+      // Helper function to check if a date is within a range
+      function isDateInRange(dateStr, startDateStr, endDateStr) {
+        const date = new Date(dateStr);
+        const start = new Date(startDateStr);
+        const end = new Date(endDateStr);
+        return date >= start && date <= end;
+      }
+      
+      // Date selection logic
+      function selectDate(cell) {
+        const dateStr = cell.dataset.date;
+        const selectedDate = new Date(dateStr);
+        
+        if (!isSelecting) {
+          // First click - start date selection
+          selectedStartDate = selectedDate;
+          selectedEndDate = selectedDate; // Initially end date is same as start date
+          isSelecting = true;
+          resetDateSelectionUI();
+          cell.classList.add("selected");
+          cell.style.backgroundColor = "rgba(46, 204, 113, 0.1)";
+          updateSelectedDatesDisplay();
+        } else {
+          // Second click - end date selection
+          if (selectedDate < selectedStartDate) {
+            selectedEndDate = selectedStartDate;
+            selectedStartDate = selectedDate;
+          } else {
+            selectedEndDate = selectedDate;
+          }
+          isSelecting = false;
+          highlightSelectedDateRange();
+          updateSelectedDatesDisplay();
+          updateTeamAvailability();
+        }
+      }
+      
+      // Reset date selection UI
+      function resetDateSelectionUI() {
+        const cells = document.querySelectorAll('.calendar-day');
+        cells.forEach(cell => {
+          cell.classList.remove("selected");
+          
+          // Preserve other styles but remove selection background
+          if (cell.classList.contains("team-leave")) {
+            cell.style.backgroundColor = "rgba(241, 196, 15, 0.1)";
+          } else if (cell.classList.contains("holiday")) {
+            cell.style.backgroundColor = "rgba(231, 76, 60, 0.1)";
+          } else if (cell.classList.contains("today")) {
+            cell.style.backgroundColor = "rgba(52, 152, 219, 0.1)";
+          } else {
+            cell.style.backgroundColor = "";
+          }
+        });
+      }
+      
+      // Highlight the selected date range
+      function highlightSelectedDateRange() {
+        resetDateSelectionUI();
+        
+        if (!selectedStartDate || !selectedEndDate) return;
+        
+        const cells = document.querySelectorAll('.calendar-day');
+        cells.forEach(cell => {
+          if (!cell.dataset.date) return;
+          
+          const cellDate = new Date(cell.dataset.date);
+          if (cellDate >= selectedStartDate && cellDate <= selectedEndDate) {
+            cell.classList.add("selected");
+            cell.style.backgroundColor = "rgba(46, 204, 113, 0.1)";
+          }
+        });
+      }
+      
+      // Update the selected dates display
+      function updateSelectedDatesDisplay() {
+        const selectedDatesDiv = document.getElementById('selected-dates');
+        const selectedRangeDiv = document.getElementById('selected-range');
+        const displayStartDate = document.getElementById('display-start-date');
+        const displayEndDate = document.getElementById('display-end-date');
+        const displayTotalDays = document.getElementById('display-total-days');
+        
+        if (selectedStartDate) {
+          selectedDatesDiv.querySelector('p').style.display = 'none';
+          selectedRangeDiv.style.display = 'block';
+          
+          const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+          displayStartDate.textContent = selectedStartDate.toLocaleDateString('en-US', options);
+          displayEndDate.textContent = selectedEndDate.toLocaleDateString('en-US', options);
+          
+          const diffTime = Math.abs(selectedEndDate - selectedStartDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          displayTotalDays.textContent = diffDays + ' day(s)';
+        } else {
+          selectedDatesDiv.querySelector('p').style.display = 'block';
+          selectedRangeDiv.style.display = 'none';
+        }
+      }
+      
+      // Update team availability based on selected dates
+      function updateTeamAvailability() {
+        const availabilityChart = document.getElementById('availability-chart');
+        const teamCapacity = document.getElementById('team-capacity');
+        const capacityBar = document.getElementById('capacity-bar');
+        const availabilityMessage = document.getElementById('availability-message');
+        const teamOnLeave = document.getElementById('team-on-leave');
+        
+        if (selectedStartDate && selectedEndDate) {
+          availabilityChart.style.display = 'block';
+          
+          // Calculate overlapping team leaves (in a real app, this would be server-side)
+          const conflictingLeaves = teamLeaves.filter(leave => {
+            const leaveStart = new Date(leave.startDate);
+            const leaveEnd = new Date(leave.endDate);
+            return (leaveStart <= selectedEndDate && leaveEnd >= selectedStartDate);
+          });
+          
+          // Calculate capacity (simplified for demo)
+          const teamSize = 10; // Assuming 10 team members total
+          const capacity = 100 - (conflictingLeaves.length * 10); // Each person is 10% of capacity
+          
+          teamCapacity.textContent = capacity + '%';
+          capacityBar.style.width = capacity + '%';
+          
+          // Set color based on capacity
+          if (capacity >= 80) {
+            capacityBar.style.backgroundColor = 'var(--success-color)';
+            availabilityMessage.textContent = 'Good availability during your selected dates';
+          } else if (capacity >= 60) {
+            capacityBar.style.backgroundColor = 'var(--warning-color)';
+            availabilityMessage.textContent = 'Moderate availability - some team members will be away';
+          } else {
+            capacityBar.style.backgroundColor = 'var(--danger-color)';
+            availabilityMessage.textContent = 'Low availability - multiple team members will be away';
+          }
+          
+          // Display team members on leave
+          teamOnLeave.innerHTML = '';
+          if (conflictingLeaves.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = 'No team members on leave during this period';
+            teamOnLeave.appendChild(li);
+          } else {
+            conflictingLeaves.forEach(leave => {
+              const li = document.createElement('li');
+              li.textContent = `${leave.name} (${leave.startDate} - ${leave.endDate})`;
+              teamOnLeave.appendChild(li);
+            });
+          }
+        }
+      }
+      
+      // Apply selected dates to the form
+      if (applySelectedDatesBtn) {
+        applySelectedDatesBtn.addEventListener('click', function() {
+          if (selectedStartDate && selectedEndDate) {
+            startDate.value = formatDate(selectedStartDate);
+            endDate.value = formatDate(selectedEndDate);
+            calculateDays();
+            
+            // Scroll to the form
+            document.querySelector('.content-panel:nth-child(2)').scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      }
+      
+      // Previous month button
+      if (prevMonthPickerBtn) {
+        prevMonthPickerBtn.addEventListener('click', function() {
+          currentPickerMonth--;
+          if (currentPickerMonth < 0) {
+            currentPickerMonth = 11;
+            currentPickerYear--;
+          }
+          showPickerCalendar(currentPickerMonth, currentPickerYear);
+          highlightSelectedDateRange(); // Maintain selection after month change
+        });
+      }
+      
+      // Next month button
+      if (nextMonthPickerBtn) {
+        nextMonthPickerBtn.addEventListener('click', function() {
+          currentPickerMonth++;
+          if (currentPickerMonth > 11) {
+            currentPickerMonth = 0;
+            currentPickerYear++;
+          }
+          showPickerCalendar(currentPickerMonth, currentPickerYear);
+          highlightSelectedDateRange(); // Maintain selection after month change
+        });
+      }
+      
+      // Initialize picker calendar
+      if (datePickerBody) {
+        showPickerCalendar(currentPickerMonth, currentPickerYear);
+      }
+    });
+  </script>
+</body>
+</html>
