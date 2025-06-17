@@ -1,18 +1,8 @@
 <?php
-// admin/admin_dashboard.php - Admin Dashboard
-
 require_once '../php/functions.php';
-
-// Require admin access
 require_admin();
-
-// Get dashboard statistics
 $stats = get_dashboard_stats();
-
-// Get recent activity
 $recent_activity = get_recent_activity(10);
-
-// Get pending leave requests
 $pending_leaves = get_pending_leaves();
 ?>
 <!DOCTYPE html>
@@ -26,7 +16,6 @@ $pending_leaves = get_pending_leaves();
 </head>
 <body>
   <div class="container">
-    <!-- Main Header -->
     <table class="main-header">
       <tr>
         <td colspan="7">
@@ -43,15 +32,11 @@ $pending_leaves = get_pending_leaves();
         <td><a href="../user/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></td>
       </tr>
     </table>
-
-    <!-- Welcome Panel -->
     <div class="content-panel">
       <div class="panel-heading text-center">
         <h2>Welcome, Administrator!</h2>
         <p>Today is <b><?php echo date('F j, Y'); ?></b> (<?php echo date('l'); ?>)</p>
       </div>
-
-      <!-- Dashboard Stats -->
       <div class="stats-container">
         <div class="stat-card">
           <div class="stat-value"><?php echo $stats['active_users']; ?></div>
@@ -71,24 +56,19 @@ $pending_leaves = get_pending_leaves();
         </div>
       </div>
     </div>
-
-    <!-- Quick Actions -->
     <div class="content-panel">
       <h3>Administrative Quick Actions</h3>
-
       <div class="card-container" style="display: flex; flex-wrap: wrap; gap: 1rem;">
         <div class="card" style="flex: 1; min-width: 250px;">
           <div class="card-header"><i class="fas fa-clipboard-check"></i> Pending Approvals</div>
           <p>You have <b><?php echo $stats['pending_leaves']; ?></b> leave requests awaiting approval</p>
           <a href="admin_leaves.php" class="btn"><i class="fas fa-eye"></i> Review Requests</a>
         </div>
-
         <div class="card" style="flex: 1; min-width: 250px;">
           <div class="card-header"><i class="fas fa-user-plus"></i> User Management</div>
           <p>Add new users or modify existing user accounts</p>
           <a href="admin_users.php" class="btn"><i class="fas fa-plus-circle"></i> Manage Users</a>
         </div>
-
         <div class="card" style="flex: 1; min-width: 250px;">
           <div class="card-header"><i class="fas fa-chart-bar"></i> Reports</div>
           <p>Generate and view system reports</p>
@@ -96,11 +76,8 @@ $pending_leaves = get_pending_leaves();
         </div>
       </div>
     </div>
-
-    <!-- Recent Activity -->
     <div class="content-panel">
       <h3><i class="fas fa-history"></i> Recent Activity</h3>
-
       <?php if (empty($recent_activity)): ?>
         <div class="alert alert-info">
           <i class="fas fa-info-circle"></i> No recent activity to display.
@@ -127,17 +104,13 @@ $pending_leaves = get_pending_leaves();
           </tbody>
         </table>
       <?php endif; ?>
-
       <div class="text-right">
         <a href="admin_logs.php" class="btn"><i class="fas fa-list"></i> View All Activity</a>
       </div>
     </div>
-
-    <!-- Pending Leave Requests Preview -->
     <?php if (!empty($pending_leaves)): ?>
     <div class="content-panel">
       <h3><i class="fas fa-clock"></i> Pending Leave Requests</h3>
-
       <table class="data-table">
         <thead>
           <tr>
@@ -172,7 +145,6 @@ $pending_leaves = get_pending_leaves();
           <?php endforeach; ?>
         </tbody>
       </table>
-
       <?php if (count($pending_leaves) > 5): ?>
         <div class="text-center mt-3">
           <a href="admin_leaves.php" class="btn">
@@ -182,24 +154,16 @@ $pending_leaves = get_pending_leaves();
       <?php endif; ?>
     </div>
     <?php endif; ?>
-
-    <!-- Footer -->
     <div class="footer">
       <p>KurdLeave System &copy; 2025</p>
     </div>
   </div>
-
-  <!-- Back to Top Button -->
   <button class="back-to-top" id="backToTop">
     <i class="fas fa-arrow-up"></i>
   </button>
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Back to Top button functionality
       const backToTopButton = document.getElementById('backToTop');
-
-      // Show/hide button based on scroll position
       window.addEventListener('scroll', function() {
         if (window.pageYOffset > 300) {
           backToTopButton.classList.add('show');
@@ -207,8 +171,6 @@ $pending_leaves = get_pending_leaves();
           backToTopButton.classList.remove('show');
         }
       });
-
-      // Scroll to top when clicked
       backToTopButton.addEventListener('click', function() {
         window.scrollTo({
           top: 0,

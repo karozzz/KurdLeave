@@ -3,10 +3,8 @@
 
 require_once '../php/functions.php';
 
-// Require admin access
 require_admin();
 
-// Get report parameters
 $report_type = $_GET['report_type'] ?? '';
 $department = $_GET['department'] ?? 'all';
 $leave_type = $_GET['leave_type'] ?? 'all';
@@ -17,7 +15,6 @@ $format = $_GET['format'] ?? 'html';
 $report_data = [];
 $report_title = '';
 
-// Generate report based on type
 if (!empty($report_type)) {
     switch ($report_type) {
         case 'leave-usage':
@@ -167,22 +164,17 @@ if (!empty($report_type)) {
     }
 }
 
-// Get departments and leave types for filters
 $departments = get_all_departments();
 $leave_types = get_all_leave_types();
 
-// Handle CSV export
 if ($format === 'csv' && !empty($report_data)) {
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="' . strtolower(str_replace(' ', '_', $report_title)) . '_' . date('Y-m-d') . '.csv"');
 
     $output = fopen('php://output', 'w');
 
-    // Write header
     if (!empty($report_data)) {
         fputcsv($output, array_keys($report_data[0]));
-
-        // Write data
         foreach ($report_data as $row) {
             fputcsv($output, $row);
         }
@@ -203,7 +195,6 @@ if ($format === 'csv' && !empty($report_data)) {
 </head>
 <body>
   <div class="container">
-    <!-- Main Header -->
     <table class="main-header">
       <tr>
         <td colspan="7">
@@ -221,7 +212,6 @@ if ($format === 'csv' && !empty($report_data)) {
       </tr>
     </table>
 
-    <!-- Generate Report Panel -->
     <div class="content-panel">
       <div class="panel-heading">
         <h2><i class="fas fa-file-alt"></i> Administrative Reports</h2>
@@ -294,7 +284,6 @@ if ($format === 'csv' && !empty($report_data)) {
       </div>
     </div>
 
-    <!-- Report Results -->
     <?php if (!empty($report_type) && !empty($report_data)): ?>
     <div class="content-panel">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -358,7 +347,6 @@ if ($format === 'csv' && !empty($report_data)) {
     </div>
     <?php endif; ?>
 
-    <!-- Quick Reports -->
     <div class="content-panel">
       <h2><i class="fas fa-bolt"></i> Quick Reports</h2>
 
@@ -389,20 +377,17 @@ if ($format === 'csv' && !empty($report_data)) {
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer">
       <p>KurdLeave System &copy; 2025</p>
     </div>
   </div>
 
-  <!-- Back to Top Button -->
   <button class="back-to-top" id="backToTop">
     <i class="fas fa-arrow-up"></i>
   </button>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Back to Top button functionality
       const backToTopButton = document.getElementById('backToTop');
 
       window.addEventListener('scroll', function() {

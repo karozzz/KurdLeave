@@ -3,16 +3,13 @@
 
 require_once '../php/functions.php';
 
-// Require admin access
 require_admin();
 
-// Get filter parameters
 $action_filter = $_GET['action'] ?? 'all';
 $user_filter = $_GET['user'] ?? 'all';
 $date_from = $_GET['date_from'] ?? date('Y-m-d', strtotime('-7 days'));
 $date_to = $_GET['date_to'] ?? date('Y-m-d');
 
-// Build query conditions
 $where_conditions = ["1=1"];
 $params = [];
 
@@ -32,7 +29,6 @@ $params[] = $date_to;
 
 $where_clause = implode(' AND ', $where_conditions);
 
-// Get activity logs
 $logs = db_fetch_all("
     SELECT al.*, u.name as user_name, u.employee_id
     FROM activity_logs al
@@ -42,7 +38,6 @@ $logs = db_fetch_all("
     LIMIT 1000
 ", $params);
 
-// Get unique actions for filter
 $actions = db_fetch_all("
     SELECT DISTINCT action
     FROM activity_logs
@@ -50,7 +45,6 @@ $actions = db_fetch_all("
     ORDER BY action
 ");
 
-// Get users for filter
 $users = db_fetch_all("
     SELECT DISTINCT u.id, u.name, u.employee_id
     FROM activity_logs al
@@ -58,7 +52,6 @@ $users = db_fetch_all("
     ORDER BY u.name
 ");
 
-// Get statistics
 $stats = [
     'total_today' => db_fetch("SELECT COUNT(*) as count FROM activity_logs WHERE DATE(created_at) = CURDATE()")['count'],
     'total_week' => db_fetch("SELECT COUNT(*) as count FROM activity_logs WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)")['count'],
@@ -77,7 +70,6 @@ $stats = [
 </head>
 <body>
   <div class="container">
-    <!-- Main Header -->
     <table class="main-header">
       <tr>
         <td colspan="7">
@@ -102,7 +94,6 @@ $stats = [
         <p>Monitor and audit all system activities</p>
       </div>
 
-      <!-- Statistics -->
       <div class="stats-container">
         <div class="stat-card">
           <div class="stat-value"><?php echo $stats['total_today']; ?></div>
@@ -125,7 +116,6 @@ $stats = [
       </div>
     </div>
 
-    <!-- Log Filters -->
     <div class="content-panel">
       <div class="card">
         <div class="card-header">
@@ -174,7 +164,6 @@ $stats = [
       </div>
     </div>
 
-    <!-- Activity Log -->
     <div class="content-panel">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3><i class="fas fa-list"></i> Activity Log (<?php echo count($logs); ?> records)</h3>

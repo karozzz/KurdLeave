@@ -1,26 +1,21 @@
 <?php
-// admin/admin_settings.php - Admin System Settings
-
+// admin/admin_settings.php
 require_once '../php/functions.php';
 
-// Require admin access
 require_admin();
 
 $success_message = '';
 $error_message = '';
 
-// Handle settings updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_company'])) {
-        // Company settings update
         $company_name = sanitize_input($_POST['company_name'] ?? '');
         $admin_email = sanitize_input($_POST['admin_email'] ?? '');
         $timezone = sanitize_input($_POST['timezone'] ?? 'UTC');
         $date_format = sanitize_input($_POST['date_format'] ?? 'DD/MM/YYYY');
 
         if (!empty($company_name) && !empty($admin_email)) {
-            // In a real application, these would be stored in a settings table
-            // For now, we'll just show success
+
             $success_message = 'Company settings updated successfully.';
             log_activity($_SESSION['user_id'], 'Settings Update', 'Updated company settings');
         } else {
@@ -29,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['backup_database'])) {
-        // Database backup simulation
         $backup_file = 'backup_' . date('Y_m_d_H_i_s') . '.sql';
         $success_message = "Database backup initiated. File: {$backup_file}";
         log_activity($_SESSION['user_id'], 'Database Backup', 'Manual database backup initiated');
@@ -85,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (db_insert('holidays', $holiday_data)) {
                 $success_message = 'Holiday created successfully.';
                 log_activity($_SESSION['user_id'], 'Holiday Management', "Created holiday: {$holiday_name}");
-                // Clear form
                 $_POST = [];
             } else {
                 $error_message = 'Failed to create holiday.';
@@ -96,21 +89,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get system information
 $system_info = [
     'php_version' => phpversion(),
     'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
     'database_version' => db_fetch("SELECT VERSION() as version")['version'] ?? 'Unknown',
     'total_users' => db_fetch("SELECT COUNT(*) as count FROM users")['count'],
     'total_leaves' => db_fetch("SELECT COUNT(*) as count FROM leaves")['count'],
-    'disk_space' => '2.5 GB', // Placeholder
-    'last_backup' => '2025-04-27 23:00:00' // Placeholder
+    'disk_space' => '2.5 GB',
+    'last_backup' => '2025-04-27 23:00:00'
 ];
 
-// Get leave types
 $leave_types = get_all_leave_types();
 
-// Get holidays
 $upcoming_holidays = db_fetch_all("
     SELECT * FROM holidays
     WHERE date >= CURDATE()
@@ -165,7 +155,6 @@ $upcoming_holidays = db_fetch_all("
         </div>
       <?php endif; ?>
 
-      <!-- Configuration Categories -->
       <div class="card-container" style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: var(--spacing-lg);">
         <div class="card" style="flex: 1; min-width: 200px; text-align: center;">
           <div class="card-header"><i class="fas fa-sliders-h"></i> General Settings</div>
@@ -193,7 +182,6 @@ $upcoming_holidays = db_fetch_all("
       </div>
     </div>
 
-    <!-- General Settings Section -->
     <div id="general-section" class="content-panel" style="display: block;">
       <h3><i class="fas fa-sliders-h"></i> General Settings</h3>
       <form method="POST" action="">
@@ -241,11 +229,9 @@ $upcoming_holidays = db_fetch_all("
       </form>
     </div>
 
-    <!-- Leave Types Section -->
     <div id="leave-types-section" class="content-panel" style="display: none;">
       <h3><i class="fas fa-list"></i> Leave Types Management</h3>
 
-      <!-- Current Leave Types -->
       <h4>Current Leave Types</h4>
       <table class="data-table">
         <thead>
@@ -280,7 +266,6 @@ $upcoming_holidays = db_fetch_all("
         </tbody>
       </table>
 
-      <!-- Add New Leave Type -->
       <div class="card mt-3">
         <div class="card-header"><i class="fas fa-plus-circle"></i> Add New Leave Type</div>
         <form method="POST" action="" class="form-grid mt-2">
@@ -332,11 +317,9 @@ $upcoming_holidays = db_fetch_all("
       </div>
     </div>
 
-    <!-- Holidays Section -->
     <div id="holidays-section" class="content-panel" style="display: none;">
       <h3><i class="fas fa-calendar"></i> Holiday Management</h3>
 
-      <!-- Upcoming Holidays -->
       <h4>Upcoming Holidays</h4>
       <table class="data-table">
         <thead>
@@ -374,7 +357,6 @@ $upcoming_holidays = db_fetch_all("
         </tbody>
       </table>
 
-      <!-- Add New Holiday -->
       <div class="card mt-3">
         <div class="card-header"><i class="fas fa-plus-circle"></i> Add New Holiday</div>
         <form method="POST" action="" class="form-grid mt-2">
@@ -424,7 +406,6 @@ $upcoming_holidays = db_fetch_all("
       </div>
     </div>
 
-    <!-- System Information Section -->
     <div id="system-section" class="content-panel" style="display: none;">
       <h3><i class="fas fa-info-circle"></i> System Information</h3>
 
@@ -460,7 +441,6 @@ $upcoming_holidays = db_fetch_all("
           </table>
         </div>
 
-        <!-- Backup & Maintenance -->
         <div style="flex: 1; min-width: 380px;">
           <h4><i class="fas fa-database"></i> Backup & Maintenance</h4>
           <table class="data-table">
@@ -495,7 +475,6 @@ $upcoming_holidays = db_fetch_all("
         </div>
       </div>
 
-      <!-- System License -->
       <div class="card mt-3">
         <div class="card-header"><i class="fas fa-key"></i> System License Information</div>
         <table class="data-table">
@@ -523,20 +502,17 @@ $upcoming_holidays = db_fetch_all("
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer">
       <p>KurdLeave System &copy; 2025</p>
     </div>
   </div>
 
-  <!-- Back to Top Button -->
   <button class="back-to-top" id="backToTop">
     <i class="fas fa-arrow-up"></i>
   </button>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Back to Top button functionality
       const backToTopButton = document.getElementById('backToTop');
 
       window.addEventListener('scroll', function() {
@@ -554,18 +530,12 @@ $upcoming_holidays = db_fetch_all("
         });
       });
     });
-
     function showSection(sectionName) {
-      // Hide all sections
       const sections = ['general-section', 'leave-types-section', 'holidays-section', 'system-section'];
       sections.forEach(section => {
         document.getElementById(section).style.display = 'none';
       });
-
-      // Show selected section
       document.getElementById(sectionName + '-section').style.display = 'block';
-
-      // Scroll to section
       document.getElementById(sectionName + '-section').scrollIntoView({
         behavior: 'smooth',
         block: 'start'
