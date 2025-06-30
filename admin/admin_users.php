@@ -1,15 +1,24 @@
 <?php
-// admin/admin_users.php - Admin User Management
+// admin/admin_users.php - User Management Page
+// This is the employee directory on steroids! Here administrators can:
+// - View all employees in the system
+// - Create new user accounts
+// - Activate/deactivate existing accounts
+// - Reset passwords for users who forgot them
+// - Filter and search through all users
+// - Assign roles and departments
 
 require_once '../php/functions.php';
 
-// Require admin access
+// Make sure only administrators can access this page
 require_admin();
 
+// Variables to hold messages we'll show to the user
 $success_message = '';
 $error_message = '';
 
-// Handle user actions
+// HANDLE USER MANAGEMENT ACTIONS
+// This section processes various actions admins can take on user accounts
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
@@ -17,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         switch ($action) {
             case 'activate':
+                // Turn on a user account so they can log in again
                 if (db_update('users', ['status' => 'active'], 'id = ?', [$user_id])) {
                     $success_message = 'User activated successfully.';
                     log_activity($_SESSION['user_id'], 'User Management', "Activated user ID: {$user_id}");
@@ -26,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'deactivate':
-                if ($user_id != $_SESSION['user_id']) { // Prevent self-deactivation
+                // Turn off a user account (they can't log in but data stays)
+                if ($user_id != $_SESSION['user_id']) { // Prevent admins from locking themselves out
                     if (db_update('users', ['status' => 'inactive'], 'id = ?', [$user_id])) {
                         $success_message = 'User deactivated successfully.';
                         log_activity($_SESSION['user_id'], 'User Management', "Deactivated user ID: {$user_id}");
@@ -39,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'reset_password':
+                // Reset someone's password to a temporary one
                 $new_password = password_hash('temp123', PASSWORD_DEFAULT);
                 if (db_update('users', ['password' => $new_password], 'id = ?', [$user_id])) {
                     $success_message = 'Password reset to: temp123 (user should change this immediately)';
@@ -50,34 +62,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Handle new user creation
+    // HANDLE NEW USER CREATION
+    // This runs when an admin fills out the "Create New User" form
     if (isset($_POST['create_user'])) {
+        // Collect and clean all the form data
         $name = sanitize_input($_POST['name'] ?? '');
         $email = sanitize_input($_POST['email'] ?? '');
         $employee_id = sanitize_input($_POST['employee_id'] ?? '');
         $phone = sanitize_input($_POST['phone'] ?? '');
         $department_id = (int)($_POST['department_id'] ?? 0);
-        $manager_id = (int)($_POST['manager_id'] ?? 0) ?: null;
+        $manager_id = (int)($_POST['manager_id'] ?? 0) ?: null; // null if no manager selected
         $role = $_POST['role'] ?? 'employee';
         $join_date = $_POST['join_date'] ?? date('Y-m-d');
 
-        // Validation
+        // Validate required fields first
         if (empty($name) || empty($email) || empty($employee_id)) {
             $error_message = 'Name, email, and employee ID are required.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error_message = 'Invalid email format.';
         } else {
-            // Check for duplicate email/employee_id
+            // Check if email or employee ID already exists (no duplicates allowed)
             $existing = db_fetch("SELECT id FROM users WHERE email = ? OR employee_id = ?", [$email, $employee_id]);
             if ($existing) {
                 $error_message = 'Email or Employee ID already exists.';
             } else {
+                // All validation passed, create the new user account
                 $user_data = [
                     'name' => $name,
                     'email' => $email,
                     'employee_id' => $employee_id,
                     'phone' => $phone,
-                    'password' => password_hash('temp123', PASSWORD_DEFAULT),
+                    'password' => password_hash('temp123', PASSWORD_DEFAULT), // Default password
                     'department_id' => $department_id ?: null,
                     'manager_id' => $manager_id,
                     'role' => $role,
@@ -90,20 +105,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $success_message = "User created successfully. Temporary password: temp123";
                     log_activity($_SESSION['user_id'], 'User Management', "Created new user: {$name} ({$email})");
 
-                    // Create default leave balances
+                    // CREATE DEFAULT LEAVE BALANCES FOR NEW USER
+                    // Every new employee needs vacation days for each leave type
                     $leave_types = get_all_leave_types();
                     foreach ($leave_types as $leave_type) {
                         db_insert('leave_balances', [
                             'user_id' => $new_user_id,
                             'leave_type_id' => $leave_type['id'],
                             'year' => date('Y'),
-                            'total_allocation' => $leave_type['default_allocation'],
-                            'used_days' => 0,
-                            'remaining_days' => $leave_type['default_allocation']
+                            'total_allocation' => $leave_type['default_allocation'], // How many days they get
+                            'used_days' => 0,                                       // Haven't used any yet
+                            'remaining_days' => $leave_type['default_allocation']   // All days available
                         ]);
                     }
 
-                    // Clear form
+                    // Clear the form so they can create another user if needed
                     $_POST = [];
                 } else {
                     $error_message = 'Failed to create user.';

@@ -1,33 +1,105 @@
 # KurdLeave - Employee Leave Management System
 
-<<<<<<< HEAD
-----------------------------------------------------
-=======
-KurdLeave is a comprehensive, professional-grade employee leave management system designed to streamline the entire leave application, approval, and tracking process within organizations. The system features a clean, modern interface with role-based access control for employees, managers, and administrators.
+## 🎯 What This System Does (In Simple Terms)
 
-## 📋 Project Overview
+KurdLeave is like a digital assistant for managing employee vacations and time off. Think of it as replacing those old paper forms and email chains with a clean, easy-to-use website where:
 
-This project is currently in its **frontend development phase**, featuring complete UI/UX implementations for both user-facing and administrative interfaces. Backend functionality will be integrated in subsequent phases of development.
+- **Employees** can request time off, see their vacation balance, and track their requests
+- **Managers** can approve or deny requests from their team members
+- **Administrators** can manage the entire system, add new users, and see reports
 
-## 🏗️ System Architecture
+It's designed to make taking time off as smooth and transparent as possible for everyone involved.
 
-### User Roles & Access Levels
+## 🏗️ How It's Built (System Architecture)
 
-- **Employee**: Basic users who can apply for leave, view their leave history, and manage their profiles
-- **Manager**: Mid-level users with additional approval capabilities for team members' leave requests
-- **Administrator**: Full system access including user management, system configuration, and comprehensive reporting
+This system is built like a well-organized office building with different floors for different purposes:
 
-### Core Modules
+### 🏢 The Building Structure (File Organization)
 
-#### 🔑 Authentication & User Management
+```
+KurdLeave/
+├── 📁 php/              # The engine room - core system functions
+│   ├── config.php       # Settings and database connection info
+│   ├── database.php     # Database communication tools
+│   └── functions.php    # Useful functions used throughout the app
+├── 📁 admin/            # Admin control panel pages
+├── 📁 user/             # Regular employee pages
+├── 📁 database/         # Database setup files
+├── 📁 admincss/         # Styling for admin pages
+├── 📁 usercss/          # Styling for user pages
+└── index.php            # Front door - decides where to send visitors
+```
 
-- **Login System** (`user/login.html`): Secure user authentication with role-based redirection
-- **User Profile Management** (`user/profile.html`): Personal information, contact details, and notification preferences
-- **Admin User Management** (`admin/admin_users.html`): Complete user lifecycle management including creation, modification, and deactivation
+### 👥 Who Can Do What (User Roles)
 
-#### 📝 Leave Management
+**🔴 Administrator (Full Access)**
 
-- **Leave Application** (`user/apply_leave.html`): Comprehensive leave request form with multiple leave types, date selection, and file attachments
+- Manage all users and departments
+- Approve/reject any leave request
+- View all reports and system statistics
+- Configure system settings
+- See all activity logs
+
+**🟡 Manager (Department Access)**
+
+- Approve/reject leave requests from their team
+- View department reports
+- Manage their own leave requests
+
+**🟢 Employee (Personal Access)**
+
+- Submit leave requests
+- View their leave history and remaining balance
+- Update their personal profile
+- Check leave calendar
+
+### 🗄️ How Data Is Stored (Database Structure)
+
+The system uses several connected tables, like filing cabinets that reference each other:
+
+- **Users**: Employee information, roles, departments
+- **Departments**: Company departments (IT, HR, Sales, etc.)
+- **Leave Types**: Different kinds of leave (vacation, sick, personal)
+- **Leaves**: Individual leave requests with status and dates
+- **Leave Balances**: How many days each person has left
+- **Activity Logs**: Track of who did what when
+
+### � Core System Functions (What The Code Does)
+
+**Authentication System (`php/functions.php`)**
+
+- `login()`: Checks if email/password are correct
+- `is_admin()`, `is_manager()`: Determines user permissions
+- `require_login()`: Blocks access if not logged in
+
+**Leave Management**
+
+- `get_pending_leaves()`: Find requests waiting for approval
+- `calculate_working_days()`: Skip weekends when counting days
+- `get_user_leave_balance()`: Check remaining vacation days
+
+**Data Handling (`php/database.php`)**
+
+- `db_fetch()`: Get one record from database
+- `db_insert()`: Add new record
+- `db_update()`: Modify existing record
+- All functions use prepared statements for security
+
+### 🌐 How Pages Work Together
+
+**The Flow:**
+
+1. **index.php** - Front door, decides where to send people
+2. **user/login.php** - Login form, validates credentials
+3. **admin/admin_dashboard.php** - Admin homepage with statistics
+4. **user/home.php** - Employee homepage with personal info
+
+**Modal System:**
+Instead of separate pages for every action, we use popup modals:
+
+- View leave details in a popup
+- Approve/reject requests inline
+- Better user experience, less page reloading
 - **Leave Tracking** (`user/my_leaves.html`): Personal leave history with status tracking, document management, and filtering capabilities
 - **Admin Leave Management** (`admin/admin_leaves.html`): System-wide leave policy configuration, leave type management, and request review
 
@@ -149,4 +221,165 @@ KurdLeave addresses critical organizational needs by:
 ---
 
 _This project represents a complete frontend implementation of an enterprise-grade leave management system, ready for backend integration and deployment._
->>>>>>> test
+
+## 🧮 Key Algorithms Explained
+
+### Working Days Calculation
+
+When someone requests leave, we need to figure out how many actual working days they're taking off:
+
+```php
+function calculate_working_days($start_date, $end_date) {
+    // Create date objects for start and end
+    $start = new DateTime($start_date);
+    $end = new DateTime($end_date);
+    $end = $end->modify('+1 day'); // Include the end date
+
+    $working_days = 0;
+    // Loop through each day in the range
+    foreach ($period as $date) {
+        // Skip weekends (Saturday = 6, Sunday = 0)
+        if ($date->format('w') != 0 && $date->format('w') != 6) {
+            $working_days++; // Count this as a working day
+        }
+    }
+    return $working_days;
+}
+```
+
+**Why this matters**: If someone takes off Friday through Monday, they only use 2 vacation days, not 4.
+
+### Leave Balance Updates
+
+When a leave request gets approved, we automatically update the person's remaining balance:
+
+```php
+// If approved, subtract days from their balance
+if ($status === 'approved') {
+    $new_used = $balance['used_days'] + $leave['working_days'];
+    $new_remaining = $balance['remaining_days'] - $leave['working_days'];
+    // Update their balance (but never go below 0)
+    $new_remaining = max(0, $new_remaining);
+}
+```
+
+### Session Management
+
+The system keeps track of who's logged in using PHP sessions:
+
+```php
+// When someone logs in successfully
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['user_role'] = $user['role'];
+
+// Check if they're still logged in
+function is_logged_in() {
+    return isset($_SESSION['user_id']);
+}
+```
+
+## 🔒 Security Features
+
+**Input Sanitization**: All user input is cleaned to prevent attacks
+
+```php
+function sanitize_input($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+```
+
+**Prepared Statements**: Database queries use placeholders to prevent SQL injection
+
+```php
+$user = db_fetch("SELECT * FROM users WHERE email = ? AND status = 'active'", [$email]);
+```
+
+**Role-Based Access**: Users can only access pages appropriate for their role
+
+```php
+function require_admin() {
+    require_login(); // Make sure they're logged in first
+    if (!is_admin()) {
+        redirect('/user/home.php'); // Send them away if not admin
+    }
+}
+```
+
+**Password Hashing**: Passwords are never stored in plain text
+
+```php
+// When creating account
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+// When logging in
+if (password_verify($password, $user['password'])) {
+    // Password is correct
+}
+```
+
+## 🚀 How to Use the System
+
+### For Administrators
+
+1. **Login** with admin credentials at `/user/login.php`
+2. **Dashboard** shows key statistics and pending requests
+3. **Approve/Reject** leaves by clicking "Review" on any request
+4. **Manage Users** through the user management section
+5. **View Reports** to track leave usage across the company
+
+### For Employees
+
+1. **Login** with your employee credentials
+2. **View Dashboard** to see your leave balance and history
+3. **Apply for Leave** using the leave request form
+4. **Track Requests** to see approval status
+5. **Update Profile** to keep your information current
+
+### For Managers
+
+1. **Login** with manager credentials
+2. **Approve Team Requests** from your department
+3. **View Team Reports** to track your department's leave usage
+4. **Manage Own Leave** just like regular employees
+
+## 🛠️ Technical Implementation Details
+
+### Database Relationships
+
+- **Users** belong to **Departments**
+- **Users** have multiple **Leave Balances** (one per leave type per year)
+- **Users** submit **Leaves** (requests) that reference **Leave Types**
+- **Activity Logs** track all user actions
+
+### Error Handling
+
+The system gracefully handles errors:
+
+- Database connection failures show user-friendly messages
+- Invalid login attempts are logged for security
+- Missing required fields are clearly highlighted
+- System errors are logged for administrator review
+
+### Performance Considerations
+
+- **Connection Pooling**: Single database connection shared across requests
+- **Efficient Queries**: Join tables to get all needed data in one query
+- **Minimal JavaScript**: Fast page loads with progressive enhancement
+- **Responsive Design**: Works well on phones, tablets, and computers
+
+## 📊 Key Features Summary
+
+✅ **Complete Leave Management**: Request, approve, track, and report on all leave
+✅ **Role-Based Access**: Different interfaces for different user types
+✅ **Real-Time Updates**: Instant feedback on leave request status changes
+✅ **Automatic Calculations**: Working days, leave balances, and statistics
+✅ **Activity Logging**: Complete audit trail of all system actions
+✅ **Modal Interface**: Smooth user experience with popup forms
+✅ **Responsive Design**: Works on desktop, tablet, and mobile devices
+✅ **Security First**: Input validation, prepared statements, and role checks
+
+## 🎯 The Bottom Line
+
+This system replaces manual leave management with an automated, secure, and user-friendly web application. It reduces administrative overhead, improves transparency, and provides valuable insights into leave patterns across the organization.
+
+The code is written to be maintainable and understandable, with comprehensive comments explaining not just what each function does, but why it's needed and how it fits into the bigger picture.

@@ -1,61 +1,110 @@
 <?php
+/*
+ * ADMIN ACTIVITY LOGS PAGE - The System's Security Camera! 📹
+ * ============================================================
+ *
+ * Hey there! This page is like having security cameras for your leave management system.
+ * It keeps track of everything that everyone does, so you can:
+ *
+ * - 🕵️ See who did what and when (like a detective reviewing evidence)
+ * - 🔍 Search for specific activities or users
+ * - 📊 Monitor system usage and security
+ * - 🚨 Spot any unusual or suspicious behavior
+ * - 📝 Keep records for compliance and auditing
+ *
+ * WHAT THIS PAGE DOES (The Big Picture):
+ * Think of this as the "Recent Activity" feed on social media, but for your business system.
+ * Every time someone logs in, creates a user, approves a leave, or changes settings,
+ * it gets recorded here with a timestamp and details.
+ *
+ * TYPES OF ACTIVITIES WE TRACK:
+ * - 🔐 Login/Logout events
+ * - 👥 User management (create, update, delete users)
+ * - 📅 Leave management (create, approve, reject requests)
+ * - ⚙️ Settings changes
+ * - 📊 Report generation
+ * - 💾 Database backups
+ *
+ * It's like having a detailed diary of everything that happens in your system! 📚
+ */
+
 // admin/admin_logs.php - Admin Activity Logs
 
 require_once '../php/functions.php';
 
+// SECURITY CHECK: Only admin users can view activity logs
+// (Regular employees shouldn't see what everyone else is doing!)
 require_admin();
 
-$action_filter = $_GET['action'] ?? 'all';
-$user_filter = $_GET['user'] ?? 'all';
-$date_from = $_GET['date_from'] ?? date('Y-m-d', strtotime('-7 days'));
-$date_to = $_GET['date_to'] ?? date('Y-m-d');
+// COLLECT FILTER PARAMETERS: What specific activities does the admin want to see?
+$action_filter = $_GET['action'] ?? 'all';           // What type of action (login, create user, etc.)
+$user_filter = $_GET['user'] ?? 'all';               // Activities by specific user
+$date_from = $_GET['date_from'] ?? date('Y-m-d', strtotime('-7 days'));  // Start date (default: last 7 days)
+$date_to = $_GET['date_to'] ?? date('Y-m-d');        // End date (default: today)
 
-$where_conditions = ["1=1"];
-$params = [];
+// BUILD DATABASE QUERY CONDITIONS: Start with basic rules, then add filters
+$where_conditions = ["1=1"];  // Always true - a starting point for adding more conditions
+$params = [];                 // Values for the database query
 
+// APPLY ACTION FILTER: If they want to see specific types of activities
 if ($action_filter !== 'all') {
-    $where_conditions[] = "al.action = ?";
-    $params[] = $action_filter;
+    $where_conditions[] = "al.action = ?";  // Add action filter to the query
+    $params[] = $action_filter;             // Remember which action they want
 }
 
+// APPLY USER FILTER: If they want to see activities by a specific person
 if ($user_filter !== 'all') {
-    $where_conditions[] = "al.user_id = ?";
-    $params[] = $user_filter;
+    $where_conditions[] = "al.user_id = ?";  // Add user filter to the query
+    $params[] = $user_filter;                // Remember which user they want
 }
 
+// APPLY DATE RANGE FILTER: Only show activities within the chosen time period
 $where_conditions[] = "DATE(al.created_at) BETWEEN ? AND ?";
-$params[] = $date_from;
-$params[] = $date_to;
+$params[] = $date_from;  // From this date...
+$params[] = $date_to;    // ...to this date
 
+// COMBINE ALL FILTERS: Join them with 'AND' so all conditions must be true
 $where_clause = implode(' AND ', $where_conditions);
 
+// GET THE ACTIVITY LOGS: Retrieve all matching activities from the database
+// This is like asking: "Show me all activities that match my filters, with user details"
 $logs = db_fetch_all("
-    SELECT al.*, u.name as user_name, u.employee_id
+    SELECT al.*, u.name as user_name, u.employee_id     -- Get log details and user info
     FROM activity_logs al
-    LEFT JOIN users u ON al.user_id = u.id
-    WHERE {$where_clause}
-    ORDER BY al.created_at DESC
-    LIMIT 1000
+    LEFT JOIN users u ON al.user_id = u.id              -- Connect logs to user information
+    WHERE {$where_clause}                                -- Apply all our filters
+    ORDER BY al.created_at DESC                          -- Show newest activities first
+    LIMIT 1000                                           -- Don't overwhelm with too many results
 ", $params);
 
+// GET AVAILABLE ACTIONS: For the filter dropdown - what types of activities exist?
 $actions = db_fetch_all("
-    SELECT DISTINCT action
+    SELECT DISTINCT action                               -- Get unique action types
     FROM activity_logs
-    WHERE action IS NOT NULL
-    ORDER BY action
+    WHERE action IS NOT NULL                             -- Skip any empty actions
+    ORDER BY action                                      -- Sort alphabetically
 ");
 
+// GET ACTIVE USERS: For the user filter dropdown - who has been doing activities?
 $users = db_fetch_all("
-    SELECT DISTINCT u.id, u.name, u.employee_id
+    SELECT DISTINCT u.id, u.name, u.employee_id         -- Get unique users who have activity
     FROM activity_logs al
-    JOIN users u ON al.user_id = u.id
-    ORDER BY u.name
+    JOIN users u ON al.user_id = u.id                   -- Connect logs to users
+    ORDER BY u.name                                      -- Sort by name alphabetically
 ");
 
+// CALCULATE ACTIVITY STATISTICS: Get some quick numbers for the dashboard
 $stats = [
+    // TODAY'S ACTIVITY: How busy has the system been today?
     'total_today' => db_fetch("SELECT COUNT(*) as count FROM activity_logs WHERE DATE(created_at) = CURDATE()")['count'],
+
+    // WEEKLY ACTIVITY: How busy has it been this week?
     'total_week' => db_fetch("SELECT COUNT(*) as count FROM activity_logs WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)")['count'],
+
+    // UNIQUE USERS TODAY: How many different people used the system today?
     'unique_users_today' => db_fetch("SELECT COUNT(DISTINCT user_id) as count FROM activity_logs WHERE DATE(created_at) = CURDATE()")['count'],
+
+    // SECURITY ALERTS: Any failed login attempts today? (Potential security issues)
     'failed_logins_today' => db_fetch("SELECT COUNT(*) as count FROM activity_logs WHERE action LIKE '%Failed%' AND DATE(created_at) = CURDATE()")['count']
 ];
 ?>

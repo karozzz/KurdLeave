@@ -1,30 +1,50 @@
 <?php
+/*
+ * USER DASHBOARD - The Employee's Home Base! 🏠
+ * =============================================
+ *
+ * Welcome to the employee dashboard! This is like the "home screen" of a smartphone -
+ * it shows everything important at a glance and gives quick access to key features.
+ *
+ * WHAT EMPLOYEES SEE HERE:
+ * - 📊 Their leave balances (how many vacation days they have left)
+ * - 📅 Recent leave requests and their status
+ * - 🔔 Important notifications or pending requests
+ * - 🚀 Quick links to apply for leave, view calendar, update profile
+ * - 👤 Their personal information and department
+ *
+ * Think of this as the employee's "command center" - everything they need
+ * to manage their time off is just one click away from here! ✨
+ */
+
 // user/home.php - User Dashboard
 
 require_once '../php/functions.php';
 
-// Require login
+// SECURITY CHECK: Make sure someone is logged in before showing their personal dashboard
 require_login();
 
-// Get current user data
-$user = get_logged_in_user();
-$department = get_department_by_id($user['department_id']);
+// GET CURRENT USER INFORMATION: Who is viewing this dashboard?
+$user = get_logged_in_user();                                    // Get their full profile
+$department = get_department_by_id($user['department_id']);      // Get their department info
 
-// Get user's leave balances for current year
-$year = date('Y');
-$leave_types = get_all_leave_types();
-$leave_balances = [];
+// GET LEAVE BALANCES: How many vacation days do they have left this year?
+$year = date('Y');                                               // Current year
+$leave_types = get_all_leave_types();                           // All types of leave (vacation, sick, etc.)
+$leave_balances = [];                                            // Container for their balances
+
+// CALCULATE BALANCES FOR EACH LEAVE TYPE: Loop through each type and get their balance
 foreach ($leave_types as $leave_type) {
     $balance = get_user_leave_balance($user['id'], $leave_type['id'], $year);
     if ($balance) {
-        $leave_balances[$leave_type['id']] = $balance;
+        $leave_balances[$leave_type['id']] = $balance;           // Store their balance for this leave type
     }
 }
 
-// Get recent leave history
-$recent_leaves = get_user_leave_history($user['id'], 5);
+// GET RECENT ACTIVITY: Show their last few leave requests so they can see what's happening
+$recent_leaves = get_user_leave_history($user['id'], 5);         // Get last 5 requests
 
-// Get pending leave requests count
+// GET PENDING REQUESTS COUNT: How many requests are waiting for manager approval?
 $pending_count = db_fetch("SELECT COUNT(*) as count FROM leaves WHERE user_id = ? AND status = 'pending'", [$user['id']])['count'];
 ?>
 <!DOCTYPE html>
@@ -38,7 +58,7 @@ $pending_count = db_fetch("SELECT COUNT(*) as count FROM leaves WHERE user_id = 
 </head>
 <body>
   <div class="container">
-    <!-- Header & Navigation -->
+    <!-- MAIN NAVIGATION HEADER: The employee's menu bar -->
     <table class="main-header">
       <tr>
         <td colspan="6">
@@ -46,8 +66,9 @@ $pending_count = db_fetch("SELECT COUNT(*) as count FROM leaves WHERE user_id = 
         </td>
       </tr>
       <tr>
-        <td><b><a href="home.php"><i class="fas fa-home"></i> Home</a></b></td>
-        <td><a href="apply_leave.php"><i class="fas fa-plus-circle"></i> Apply Leave</a></td>
+        <!-- NAVIGATION LINKS: All the places employees can go -->
+        <td><b><a href="home.php"><i class="fas fa-home"></i> Home</a></b></td>          <!-- Current page (highlighted) -->
+        <td><a href="apply_leave.php"><i class="fas fa-plus-circle"></i> Apply Leave</a></td>  <!-- Request time off -->
         <td><a href="my_leaves.php"><i class="fas fa-list-check"></i> My Leaves</a></td>
         <td><a href="calendar.php"><i class="fas fa-calendar"></i> Calendar</a></td>
         <td><a href="profile.php"><i class="fas fa-user"></i> Profile</a></td>

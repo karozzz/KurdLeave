@@ -1,46 +1,81 @@
 <?php
-require_once '../php/functions.php';
-require_admin();
+/*
+ * ADMIN DASHBOARD - The Command Center! 🚀
+ * ========================================
+ *
+ * Welcome to the admin's home base! This page is like the cockpit of an airplane -
+ * it shows all the important information at a glance and lets you take quick actions.
+ *
+ * Think of this as your company's "mission control" where you can:
+ * - 👀 See what's happening right now (pending requests, recent activity)
+ * - 📊 Check system health (how many users, requests, etc.)
+ * - ⚡ Take quick actions (approve/reject leave requests)
+ * - 🔍 Spot issues that need attention
+ *
+ * WHAT YOU'LL SEE HERE:
+ * - Statistics cards showing key numbers
+ * - Pending leave requests waiting for your decision
+ * - Recent system activity (who did what when)
+ * - Quick links to other admin functions
+ *
+ * It's designed to give you the "big picture" in just a few seconds! 🖼️
+ */
 
+// admin/admin_dashboard.php - Main Admin Dashboard
+
+require_once '../php/functions.php';
+
+// SECURITY CHECKPOINT: Only admin users can access this command center
+require_admin(); // Make sure only admins can access this page
+
+// MESSAGE CONTAINERS: For showing success/error messages to the user
 $success_message = '';
 $error_message = '';
 
-// Handle approve/reject actions
+// HANDLE LEAVE APPROVAL/REJECTION FROM THE DASHBOARD
+// This is like having a "quick action" button - admins can approve/reject right from here
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $leave_id = (int)($_POST['leave_id'] ?? 0);
-    $action = $_POST['action'];
-    $comments = sanitize_input($_POST['admin_comments'] ?? '');
+    // COLLECT THE ACTION DETAILS: What are they trying to do?
+    $leave_id = (int)($_POST['leave_id'] ?? 0);              // Which leave request?
+    $action = $_POST['action'];                               // "approve" or "reject"?
+    $comments = sanitize_input($_POST['admin_comments'] ?? ''); // Any admin comments?
 
+    // VALIDATE THE INPUT: Make sure we have everything we need
     if ($leave_id && in_array($action, ['approve', 'reject'])) {
+        // DETERMINE THE NEW STATUS: Convert action to database status
         $status = ($action === 'approve') ? 'approved' : 'rejected';
-        $admin_id = $_SESSION['user_id'];
+        $admin_id = $_SESSION['user_id']; // Who is making this decision?
 
+        // PREPARE THE DATABASE UPDATE: What needs to change in the database
         $update_data = [
             'status' => $status,
             'admin_comments' => $comments,
             'approved_by' => $admin_id,
-            'approved_at' => date('Y-m-d H:i:s')
+            'approved_at' => date('Y-m-d H:i:s') // When did this happen?
         ];
 
+        // Try to update the leave request in the database
         if (db_update('leaves', $update_data, 'id = :id', [':id' => $leave_id])) {
-            // Update leave balance if approved
+            // If we approved the leave, we need to update their vacation balance
             if ($status === 'approved') {
                 $leave = db_fetch("SELECT * FROM leaves WHERE id = ?", [$leave_id]);
                 if ($leave) {
                     $year = date('Y', strtotime($leave['start_date']));
                     $balance = get_user_leave_balance($leave['user_id'], $leave['leave_type_id'], $year);
                     if ($balance) {
+                        // Subtract the vacation days from their remaining balance
                         $new_used = $balance['used_days'] + $leave['working_days'];
                         $new_remaining = $balance['remaining_days'] - $leave['working_days'];
                         db_update('leave_balances', [
                             'used_days' => $new_used,
-                            'remaining_days' => max(0, $new_remaining)
+                            'remaining_days' => max(0, $new_remaining) // Don't go below 0
                         ], 'user_id = :user_id AND leave_type_id = :leave_type_id AND year = :year',
                         [':user_id' => $leave['user_id'], ':leave_type_id' => $leave['leave_type_id'], ':year' => $year]);
                     }
                 }
             }
 
+            // Show success message and log what happened
             $success_message = "Leave request #L{$leave_id} has been {$status}.";
             log_activity($admin_id, 'Leave ' . ucfirst($action), "Leave request #L{$leave_id} {$status}");
         } else {
@@ -49,21 +84,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-$stats = get_dashboard_stats();
-$recent_activity = get_recent_activity(10);
-$pending_leaves = get_pending_leaves();
+// GET DATA FOR THE DASHBOARD
+// Collect all the information we need to show on the dashboard
+$stats = get_dashboard_stats();        // Numbers like total users, pending requests, etc.
+$recent_activity = get_recent_activity(10); // Last 10 things that happened in the system
+$pending_leaves = get_pending_leaves(); // Leave requests waiting for approval
 ?>
+<!--
+This is the HTML part of the admin dashboard
+It shows a nice web page with:
+- Navigation menu at the top
+- Statistics cards showing important numbers
+- Quick action buttons for common tasks
+- Recent activity log
+- Pending leave requests that need attention
+- Modal popups for approving/rejecting leaves
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KurdLeave — Admin Dashboard</title>
+  <!-- Load our custom admin styles -->
   <link rel="stylesheet" href="../admincss/admin-styles.css">
+  <!-- Load Font Awesome for nice icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="container">
+    <!-- Main navigation menu - this appears on all admin pages -->
     <table class="main-header">
       <tr>
         <td colspan="7">
@@ -71,6 +121,7 @@ $pending_leaves = get_pending_leaves();
         </td>
       </tr>
       <tr>
+        <!-- Current page is highlighted with <b> tags -->
         <td><b><a href="admin_dashboard.php"><i class="fas fa-home"></i> Admin Home</a></b></td>
         <td><a href="admin_leaves.php"><i class="fas fa-calendar-alt"></i> Leave Management</a></td>
         <td><a href="admin_users.php"><i class="fas fa-users"></i> User Management</a></td>
@@ -253,9 +304,19 @@ $pending_leaves = get_pending_leaves();
   <button class="back-to-top" id="backToTop">
     <i class="fas fa-arrow-up"></i>
   </button>
+  <!--
+  JavaScript section - this handles interactive features like:
+  - Showing modal popups when viewing leave details
+  - Handling approve/reject buttons
+  - Smooth scrolling back to top
+  - Making forms submit properly
+  -->
   <script>
+    // When the page loads, set up some interactive features
     document.addEventListener('DOMContentLoaded', function() {
       const backToTopButton = document.getElementById('backToTop');
+
+      // Show/hide the "back to top" button based on scroll position
       window.addEventListener('scroll', function() {
         if (window.pageYOffset > 300) {
           backToTopButton.classList.add('show');
@@ -263,6 +324,8 @@ $pending_leaves = get_pending_leaves();
           backToTopButton.classList.remove('show');
         }
       });
+
+      // When they click "back to top", smoothly scroll to the top
       backToTopButton.addEventListener('click', function() {
         window.scrollTo({
           top: 0,
@@ -271,8 +334,11 @@ $pending_leaves = get_pending_leaves();
       });
     });
 
+    // Show detailed information about a leave request in a popup modal
     function viewLeaveDetails(leave) {
       document.getElementById('modalTitle').textContent = 'Leave Request #L' + leave.id;
+
+      // Build the HTML content for the modal with all the leave details
       document.getElementById('modalContent').innerHTML = `
         <div class="modal-section">
           <h4>Employee Information</h4>

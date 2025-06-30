@@ -18,7 +18,11 @@
    - Go to http://localhost:8080
 
 4. **Login**
+
    - Email: `admin@gmail.com`
    - Password: `admin123`
+
+5. **Php Admin**
+   - Go to `http://localhost:8081/`
 
 Done!

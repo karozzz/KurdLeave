@@ -1,33 +1,42 @@
 -- KurdLeave Database Setup
+-- This file creates all the tables we need for our leave management system
+-- Think of it as building the filing cabinet structure before we put any files in it
+
+-- These tables work together like this:
+-- 1. Users (employees) belong to Departments
+-- 2. Users have Leave_Balances for different Leave_Types each year
+-- 3. Users submit Leaves (requests) which get approved/rejected
+-- 4. Activity_Logs track what everyone does in the system
+
 CREATE DATABASE IF NOT EXISTS kurdleave;
 USE kurdleave;
 
--- Departments Table
+-- DEPARTMENTS TABLE - Different departments in the company (IT, HR, Sales, etc.)
 CREATE TABLE departments (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
+    name VARCHAR(100) NOT NULL,           -- Like "Engineering" or "Human Resources"
+    description TEXT,                     -- What this department does
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Leave Types Table
+-- LEAVE TYPES TABLE - Different kinds of leave (vacation, sick leave, personal days)
 CREATE TABLE leave_types (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    default_allocation INT DEFAULT 0,
-    carry_forward_limit INT DEFAULT 0,
-    min_notice_days INT DEFAULT 0,
-    requires_documentation BOOLEAN DEFAULT FALSE,
+    name VARCHAR(50) NOT NULL,            -- Like "Annual Leave" or "Sick Leave"
+    default_allocation INT DEFAULT 0,     -- How many days per year do people get?
+    carry_forward_limit INT DEFAULT 0,    -- How many unused days can carry over to next year?
+    min_notice_days INT DEFAULT 0,        -- How many days notice required?
+    requires_documentation BOOLEAN DEFAULT FALSE, -- Do they need a doctor's note?
     status ENUM('active', 'inactive') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Users Table
+-- USERS TABLE - All the employees in the system
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    employee_id VARCHAR(20) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    employee_id VARCHAR(20) UNIQUE NOT NULL, -- Their employee number
+    name VARCHAR(100) NOT NULL,              -- Their full name
+    email VARCHAR(100) UNIQUE NOT NULL,      -- Their email address (used for login)
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     emergency_contact VARCHAR(100),

@@ -1,45 +1,72 @@
 <?php
+/*
+ * MY LEAVE REQUESTS PAGE - The Employee's Leave History! 📚
+ * =========================================================
+ *
+ * Hey there! This page is like having a personal filing cabinet where employees
+ * can see all their vacation requests - past, present, and pending!
+ *
+ * WHAT EMPLOYEES CAN DO HERE:
+ * - 📋 View all their leave requests in one place
+ * - 🔍 Filter by status (pending, approved, rejected) or year
+ * - 📊 See statistics about their leave usage
+ * - 👀 Check the status of pending requests
+ * - 📅 Review their leave history for planning future requests
+ *
+ * SMART FEATURES:
+ * - Shows who approved/rejected their requests and when
+ * - Displays helpful statistics (total days used, pending requests, etc.)
+ * - Color-coded status indicators for quick visual scanning
+ * - Filtering options to find specific requests quickly
+ *
+ * Think of this as their "leave request diary" - a complete record of all
+ * their time off requests with full details and current status! 📖
+ */
+
 // user/my_leaves.php - My Leave Requests
 
 require_once '../php/functions.php';
 
-// Require login
+// SECURITY CHECK: Make sure someone is logged in before showing their personal leave history
 require_login();
 
-// Get current user data
+// GET USER INFORMATION: Whose leave requests are we showing?
 $user = get_logged_in_user();
 
-// Get filter parameters
-$status_filter = $_GET['status'] ?? 'all';
-$year_filter = $_GET['year'] ?? date('Y');
+// GET FILTER PARAMETERS: What specific requests do they want to see?
+$status_filter = $_GET['status'] ?? 'all';          // Filter by status (pending, approved, rejected, or all)
+$year_filter = $_GET['year'] ?? date('Y');          // Filter by year (current year by default)
 
-// Build query conditions
-$where_conditions = ["l.user_id = ?"];
-$params = [$user['id']];
+// BUILD DATABASE QUERY CONDITIONS: Start with basic rules, then add filters
+$where_conditions = ["l.user_id = ?"];              // Always filter to just this user's requests
+$params = [$user['id']];                            // User ID parameter
 
+// APPLY STATUS FILTER: If they want to see specific status requests
 if ($status_filter !== 'all') {
-    $where_conditions[] = "l.status = ?";
-    $params[] = $status_filter;
+    $where_conditions[] = "l.status = ?";           // Add status filter to query
+    $params[] = $status_filter;                     // Add status parameter
 }
 
+// APPLY YEAR FILTER: If they want to see requests from a specific year
 if ($year_filter !== 'all') {
-    $where_conditions[] = "YEAR(l.start_date) = ?";
-    $params[] = $year_filter;
+    $where_conditions[] = "YEAR(l.start_date) = ?"; // Add year filter to query
+    $params[] = $year_filter;                       // Add year parameter
 }
 
+// COMBINE FILTERS: Join all conditions with 'AND'
 $where_clause = implode(' AND ', $where_conditions);
 
-// Get user's leave requests
+// GET LEAVE REQUESTS: Retrieve all matching requests with details
 $leaves = db_fetch_all("
     SELECT l.*, lt.name as leave_type_name, u.name as approved_by_name
     FROM leaves l
-    LEFT JOIN leave_types lt ON l.leave_type_id = lt.id
-    LEFT JOIN users u ON l.approved_by = u.id
+    LEFT JOIN leave_types lt ON l.leave_type_id = lt.id       -- Get leave type name (vacation, sick, etc.)
+    LEFT JOIN users u ON l.approved_by = u.id                -- Get approver's name (who approved/rejected it)
     WHERE {$where_clause}
-    ORDER BY l.submitted_at DESC
+    ORDER BY l.submitted_at DESC                              -- Show newest requests first
 ", $params);
 
-// Get statistics
+// CALCULATE STATISTICS: Get some helpful numbers for the dashboard
 $total_requests = db_fetch("SELECT COUNT(*) as count FROM leaves WHERE user_id = ?", [$user['id']])['count'];
 $pending_requests = db_fetch("SELECT COUNT(*) as count FROM leaves WHERE user_id = ? AND status = 'pending'", [$user['id']])['count'];
 $approved_requests = db_fetch("SELECT COUNT(*) as count FROM leaves WHERE user_id = ? AND status = 'approved'", [$user['id']])['count'];

@@ -1,20 +1,58 @@
 <?php
+/*
+ * ADMIN SETTINGS PAGE - The System's Control Panel! ⚙️
+ * ======================================================
+ *
+ * Hey there! This page is like the control room of a spaceship - it's where admins can:
+ * - 🏢 Change company settings (name, email, timezone, etc.)
+ * - 📋 Manage leave types (vacation, sick leave, maternity, etc.)
+ * - 🏛️ Manage departments (HR, IT, Sales, etc.)
+ * - 🎭 Manage user roles (who can do what)
+ * - 💾 Backup the database (save all data safely)
+ * - 🛠️ Configure system-wide settings
+ *
+ * WHAT THIS PAGE DOES (The Big Picture):
+ * Think of this as the "Settings" app on your phone, but for the entire leave management system.
+ * Just like how you can change your ringtone or wallpaper, admins can change how the whole
+ * system behaves and looks for everyone.
+ *
+ * KEY SECTIONS:
+ * 1. 🏢 Company Information: Basic company details
+ * 2. 📋 Leave Types Management: What kinds of leave are available
+ * 3. 🏛️ Department Management: Organize employees into teams
+ * 4. 🎭 Role Management: Control who has what permissions
+ * 5. 💾 System Maintenance: Backup and housekeeping tasks
+ *
+ * It's like being the manager of a theme park - you decide the rules, operating hours,
+ * what attractions are available, and how everything works together! 🎢
+ */
+
 // admin/admin_settings.php
 require_once '../php/functions.php';
 
+// SECURITY CHECK: Only admin users can access the system settings
+// (We don't want regular employees changing company policies!)
 require_admin();
 
+// PREPARE MESSAGE CONTAINERS: For showing success/error messages to the user
 $success_message = '';
 $error_message = '';
 
+// PROCESS FORM SUBMISSIONS: Handle different types of settings updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // COMPANY SETTINGS UPDATE: Basic company information
     if (isset($_POST['update_company'])) {
+        // COLLECT AND SANITIZE INPUT: Make sure the data is clean and safe
         $company_name = sanitize_input($_POST['company_name'] ?? '');
         $admin_email = sanitize_input($_POST['admin_email'] ?? '');
         $timezone = sanitize_input($_POST['timezone'] ?? 'UTC');
         $date_format = sanitize_input($_POST['date_format'] ?? 'DD/MM/YYYY');
 
+        // VALIDATE REQUIRED FIELDS: Company name and email are essential
         if (!empty($company_name) && !empty($admin_email)) {
+            // TODO: Actually save these settings to the database
+            // For now, we just show success (placeholder for real implementation)
 
             $success_message = 'Company settings updated successfully.';
             log_activity($_SESSION['user_id'], 'Settings Update', 'Updated company settings');
@@ -23,34 +61,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // DATABASE BACKUP: Create a safety copy of all data
     if (isset($_POST['backup_database'])) {
+        // GENERATE BACKUP FILENAME: Include timestamp so backups don't overwrite each other
         $backup_file = 'backup_' . date('Y_m_d_H_i_s') . '.sql';
+        // TODO: Actually create the backup file (this is a placeholder)
+
         $success_message = "Database backup initiated. File: {$backup_file}";
         log_activity($_SESSION['user_id'], 'Database Backup', 'Manual database backup initiated');
     }
 
+    // CREATE NEW LEAVE TYPE: Add a new type of leave (vacation, sick, etc.)
     if (isset($_POST['create_leave_type'])) {
-        $name = sanitize_input($_POST['leave_type_name'] ?? '');
-        $allocation = (int)($_POST['allocation'] ?? 0);
-        $carry_forward = (int)($_POST['carry_forward'] ?? 0);
-        $notice = (int)($_POST['notice'] ?? 0);
-        $documentation = $_POST['documentation'] ?? 'no';
-        $status = $_POST['status'] ?? 'active';
+        // COLLECT LEAVE TYPE DETAILS: All the rules for this type of leave
+        $name = sanitize_input($_POST['leave_type_name'] ?? '');           // What to call it
+        $allocation = (int)($_POST['allocation'] ?? 0);                   // How many days per year
+        $carry_forward = (int)($_POST['carry_forward'] ?? 0);             // How many can roll over to next year
+        $notice = (int)($_POST['notice'] ?? 0);                          // How many days notice required
+        $documentation = $_POST['documentation'] ?? 'no';                // Does it need a doctor's note?
+        $status = $_POST['status'] ?? 'active';                          // Is it available for use?
 
+        // VALIDATE MINIMUM REQUIREMENTS: At least need a name
         if (!empty($name)) {
+            // PREPARE THE DATA: Organize it for database storage
             $leave_type_data = [
                 'name' => $name,
-                'default_allocation' => $allocation,
-                'carry_forward_limit' => $carry_forward,
-                'min_notice_days' => $notice,
-                'requires_documentation' => $documentation === 'yes' ? 1 : 0,
+                'default_allocation' => $allocation,          // Default days per year
+                'carry_forward_limit' => $carry_forward,      // Max days that can roll over
+                'min_notice_days' => $notice,                 // Minimum advance notice
+                'requires_documentation' => $documentation === 'yes' ? 1 : 0,  // Convert yes/no to 1/0
                 'status' => $status
             ];
 
+            // SAVE TO DATABASE: Add this new leave type
             if (db_insert('leave_types', $leave_type_data)) {
                 $success_message = 'Leave type created successfully.';
                 log_activity($_SESSION['user_id'], 'Leave Type Management', "Created leave type: {$name}");
-                // Clear form
+                // Clear form so they can add another one if needed
                 $_POST = [];
             } else {
                 $error_message = 'Failed to create leave type.';
@@ -60,26 +107,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // CREATE COMPANY HOLIDAY: Add dates when the company is closed
     if (isset($_POST['create_holiday'])) {
-        $holiday_name = sanitize_input($_POST['holiday_name'] ?? '');
-        $holiday_date = $_POST['holiday_date'] ?? '';
-        $holiday_type = $_POST['holiday_type'] ?? 'public';
-        $holiday_location = $_POST['holiday_location'] ?? 'all';
-        $holiday_description = sanitize_input($_POST['holiday_description'] ?? '');
+        // COLLECT HOLIDAY DETAILS: When and what kind of holiday
+        $holiday_name = sanitize_input($_POST['holiday_name'] ?? '');     // What to call it (Christmas, etc.)
+        $holiday_date = $_POST['holiday_date'] ?? '';                     // What date
+        $holiday_type = $_POST['holiday_type'] ?? 'public';               // Public holiday or company-specific
+        $holiday_location = $_POST['holiday_location'] ?? 'all';          // Which locations (all or specific)
+        $holiday_description = sanitize_input($_POST['holiday_description'] ?? '');  // Optional description
 
+        // VALIDATE REQUIRED FIELDS: Need at least a name and date
         if (!empty($holiday_name) && !empty($holiday_date)) {
+            // PREPARE HOLIDAY DATA: Organize for database storage
             $holiday_data = [
-                'name' => $holiday_name,
-                'date' => $holiday_date,
-                'type' => $holiday_type,
-                'applies_to' => $holiday_location,
-                'description' => $holiday_description
+                'name' => $holiday_name,                      // Holiday name (Christmas, New Year, etc.)
+                'date' => $holiday_date,                      // The actual date
+                'type' => $holiday_type,                      // Public or company-specific
+                'applies_to' => $holiday_location,           // Which locations/departments
+                'description' => $holiday_description        // Optional description
             ];
 
+            // SAVE TO DATABASE: Add this holiday to the system
             if (db_insert('holidays', $holiday_data)) {
                 $success_message = 'Holiday created successfully.';
                 log_activity($_SESSION['user_id'], 'Holiday Management', "Created holiday: {$holiday_name}");
-                $_POST = [];
+                $_POST = [];  // Clear form for next entry
             } else {
                 $error_message = 'Failed to create holiday.';
             }
@@ -89,23 +141,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// GATHER SYSTEM INFORMATION: Get current system status for the dashboard
+// This is like checking the "About" section of your phone - shows system health and stats
 $system_info = [
-    'php_version' => phpversion(),
-    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
-    'database_version' => db_fetch("SELECT VERSION() as version")['version'] ?? 'Unknown',
-    'total_users' => db_fetch("SELECT COUNT(*) as count FROM users")['count'],
-    'total_leaves' => db_fetch("SELECT COUNT(*) as count FROM leaves")['count'],
-    'disk_space' => '2.5 GB',
-    'last_backup' => '2025-04-27 23:00:00'
+    'php_version' => phpversion(),                                           // What version of PHP we're running
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',         // Web server info (Apache, Nginx, etc.)
+    'database_version' => db_fetch("SELECT VERSION() as version")['version'] ?? 'Unknown',  // Database version
+    'total_users' => db_fetch("SELECT COUNT(*) as count FROM users")['count'],              // How many employees
+    'total_leaves' => db_fetch("SELECT COUNT(*) as count FROM leaves")['count'],            // How many leave requests
+    'disk_space' => '2.5 GB',                                              // Available space (placeholder)
+    'last_backup' => '2025-04-27 23:00:00'                                // When last backup was made (placeholder)
 ];
 
+// GET CURRENT LEAVE TYPES: For display and management in the settings
 $leave_types = get_all_leave_types();
 
+// GET UPCOMING HOLIDAYS: Show the next few holidays coming up so admins can plan
 $upcoming_holidays = db_fetch_all("
     SELECT * FROM holidays
-    WHERE date >= CURDATE()
-    ORDER BY date
-    LIMIT 10
+    WHERE date >= CURDATE()        -- Only future holidays (not past ones)
+    ORDER BY date                  -- Earliest first
+    LIMIT 10                       -- Just the next 10 to keep the list manageable
 ");
 ?>
 <!DOCTYPE html>

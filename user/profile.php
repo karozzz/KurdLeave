@@ -1,51 +1,84 @@
 <?php
+/*
+ * USER PROFILE PAGE - The Employee's Personal Information Center! 👤
+ * ==================================================================
+ *
+ * Hey there! This page is like the "About Me" section of the leave management system.
+ * It's where employees can see and manage their personal information and account settings.
+ *
+ * WHAT EMPLOYEES CAN DO HERE:
+ * - 👀 View their complete profile information (name, department, manager, etc.)
+ * - 🔒 Change their password securely
+ * - 📊 See their current leave balances for all leave types
+ * - 👔 View their employment details (employee ID, role, department)
+ * - 📞 Check their contact information
+ *
+ * PERSONAL DASHBOARD FEATURES:
+ * - Shows their current leave balances (how many vacation days left)
+ * - Displays their reporting structure (who their manager is)
+ * - Secure password changing with proper validation
+ * - Complete employment information in one place
+ *
+ * Think of this as their "employee profile card" - everything about their
+ * work identity and leave entitlements in one convenient location! 🆔
+ */
+
 // user/profile.php - User Profile Page
 
 require_once '../php/functions.php';
 
-// Require login
+// SECURITY CHECK: Make sure someone is logged in before showing their profile
 require_login();
 
-// Get current user data
-$user = get_logged_in_user();
-$department = get_department_by_id($user['department_id']);
-$manager = $user['manager_id'] ? get_user_by_id($user['manager_id']) : null;
+// GET USER INFORMATION: Collect all the profile data to display
+$user = get_logged_in_user();                                   // Their basic profile
+$department = get_department_by_id($user['department_id']);     // Their department info
+$manager = $user['manager_id'] ? get_user_by_id($user['manager_id']) : null;  // Their manager (if they have one)
 
-// Get user's leave balances for current year
-$year = date('Y');
-$leave_types = get_all_leave_types();
-$leave_balances = [];
+// GET LEAVE BALANCES: Show how many days they have for each leave type
+$year = date('Y');                                              // Current year
+$leave_types = get_all_leave_types();                          // All available leave types
+$leave_balances = [];                                           // Container for their balances
+
+// CALCULATE BALANCES FOR EACH LEAVE TYPE: Loop through and get/create balances
 foreach ($leave_types as $leave_type) {
     $balance = get_user_leave_balance($user['id'], $leave_type['id'], $year);
     if ($balance) {
+        // EXISTING BALANCE: Use their actual balance from database
         $leave_balances[$leave_type['id']] = $balance;
     } else {
-        // Create default balance if doesn't exist
+        // CREATE DEFAULT BALANCE: If no balance exists yet, create a default one
         $default_balance = [
-            'total_allocation' => $leave_type['default_allocation'],
-            'used_days' => 0,
-            'remaining_days' => $leave_type['default_allocation']
+            'total_allocation' => $leave_type['default_allocation'],    // How many days they get per year
+            'used_days' => 0,                                          // Haven't used any yet
+            'remaining_days' => $leave_type['default_allocation']      // All days still available
         ];
         $leave_balances[$leave_type['id']] = $default_balance;
     }
 }
 
+// MESSAGE CONTAINERS: For showing success/error messages
 $success_message = '';
 $error_message = '';
 
-// Handle password update
+// HANDLE PASSWORD UPDATE: Process password change requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
-    $current_password = $_POST['current_password'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+    // COLLECT PASSWORD DATA: Get the password fields from the form
+    $current_password = $_POST['current_password'] ?? '';       // Their old password
+    $new_password = $_POST['new_password'] ?? '';               // What they want to change to
+    $confirm_password = $_POST['confirm_password'] ?? '';       // Confirmation of new password
 
+    // VALIDATION CHECKS: Make sure the password change is valid and secure
     if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
         $error_message = 'All password fields are required.';
     } elseif ($new_password !== $confirm_password) {
+        // PASSWORDS MUST MATCH: Make sure they typed the same password twice
         $error_message = 'New passwords do not match.';
     } elseif (strlen($new_password) < 8) {
+        // MINIMUM LENGTH: Password must be at least 8 characters for security
         $error_message = 'Password must be at least 8 characters long.';
     } elseif (!password_verify($current_password, $user['password'])) {
+        // VERIFY CURRENT PASSWORD: Make sure they know their old password
         $error_message = 'Current password is incorrect.';
     } else {
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);

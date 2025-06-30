@@ -1,61 +1,92 @@
 <?php
+/*
+ * APPLY FOR LEAVE PAGE - The Vacation Request Form! 🏖️
+ * =====================================================
+ *
+ * Hey there! This page is where employees come to request time off. Think of it as
+ * the digital version of filling out a vacation request form, but much smarter!
+ *
+ * WHAT THIS PAGE DOES:
+ * - 📝 Provides a user-friendly form to request time off
+ * - 🔍 Validates all the details (dates, balances, notice periods)
+ * - 🧮 Automatically calculates working days (skips weekends)
+ * - ✅ Checks if they have enough vacation days left
+ * - 📧 Sends the request to their manager for approval
+ * - 🛡️ Prevents common mistakes (past dates, insufficient balance, etc.)
+ *
+ * SMART FEATURES:
+ * - Shows their current leave balances so they know what's available
+ * - Prevents requesting leave for dates that already passed
+ * - Calculates exactly how many work days they'll miss
+ * - Checks company policies (minimum notice periods, etc.)
+ *
+ * It's like having a helpful HR assistant guiding them through the process! 👩‍💼
+ */
+
 // user/apply_leave.php - Apply for Leave
 
 require_once '../php/functions.php';
 
-// Require login
+// SECURITY CHECK: Make sure someone is logged in before they can request leave
 require_login();
 
-// Get current user data
-$user = get_logged_in_user();
-$leave_types = get_all_leave_types();
+// GET USER INFORMATION: Who is requesting leave?
+$user = get_logged_in_user();                                    // Get their profile
+$leave_types = get_all_leave_types();                           // Get all available leave types (vacation, sick, etc.)
 
-// Get user's leave balances for current year
-$year = date('Y');
-$leave_balances = [];
+// GET CURRENT LEAVE BALANCES: How many days do they have available?
+$year = date('Y');                                               // Current year
+$leave_balances = [];                                            // Container for their balances
+
+// CALCULATE BALANCES FOR EACH LEAVE TYPE: So they know what's available
 foreach ($leave_types as $leave_type) {
     $balance = get_user_leave_balance($user['id'], $leave_type['id'], $year);
     if ($balance) {
-        $leave_balances[$leave_type['id']] = $balance;
+        $leave_balances[$leave_type['id']] = $balance;           // Store their balance for this leave type
     }
 }
 
+// MESSAGE CONTAINERS: For showing success/error messages to the user
 $success_message = '';
 $error_message = '';
 
-// Handle form submission
+// PROCESS LEAVE REQUEST: Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $leave_type_id = (int)($_POST['leave_type'] ?? 0);
-    $start_date = $_POST['start_date'] ?? '';
-    $end_date = $_POST['end_date'] ?? '';
-    $reason = sanitize_input($_POST['reason'] ?? '');
-    $contact_info = sanitize_input($_POST['contact_info'] ?? '');
+    // COLLECT FORM DATA: What are they requesting?
+    $leave_type_id = (int)($_POST['leave_type'] ?? 0);          // What type of leave?
+    $start_date = $_POST['start_date'] ?? '';                   // When does it start?
+    $end_date = $_POST['end_date'] ?? '';                       // When does it end?
+    $reason = sanitize_input($_POST['reason'] ?? '');           // Why do they need time off?
+    $contact_info = sanitize_input($_POST['contact_info'] ?? ''); // How to reach them during leave
 
-    // Validation
+    // BASIC VALIDATION: Make sure all required fields are filled
     if (empty($leave_type_id) || empty($start_date) || empty($end_date) || empty($reason)) {
         $error_message = 'Please fill in all required fields.';
     } elseif (strtotime($start_date) < strtotime(date('Y-m-d'))) {
+        // PREVENT PAST DATES: You can't request leave for yesterday!
         $error_message = 'Start date cannot be in the past.';
     } elseif (strtotime($end_date) < strtotime($start_date)) {
+        // LOGICAL DATE CHECK: End date must be after start date
         $error_message = 'End date cannot be before start date.';
     } else {
-        // Calculate days
-        $total_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24) + 1;
-        $working_days = calculate_working_days($start_date, $end_date);
+        // CALCULATE DAYS: How many days are they requesting?
+        $total_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24) + 1;  // Total calendar days
+        $working_days = calculate_working_days($start_date, $end_date);                       // Working days (excludes weekends)
 
-        // Check leave balance
+        // CHECK LEAVE BALANCE: Do they have enough days available?
         $leave_type = get_leave_type_by_id($leave_type_id);
         $balance = $leave_balances[$leave_type_id] ?? null;
 
+        // BALANCE VALIDATION: Make sure they have enough days (except for unpaid leave)
         if ($leave_type['name'] !== 'Unpaid Leave' && $balance && $balance['remaining_days'] < $working_days) {
             $error_message = "Insufficient leave balance. You have {$balance['remaining_days']} days remaining for {$leave_type['name']}.";
         } else {
-            // Check minimum notice period
+            // CHECK NOTICE PERIOD: Did they give enough advance notice?
             $notice_days = (strtotime($start_date) - strtotime(date('Y-m-d'))) / (60 * 60 * 24);
             if ($notice_days < $leave_type['min_notice_days']) {
                 $error_message = "Minimum notice period of {$leave_type['min_notice_days']} days required for {$leave_type['name']}.";
             } else {
-                // Insert leave request
+                // ALL CHECKS PASSED: Create the leave request
                 $leave_data = [
                     'user_id' => $user['id'],
                     'leave_type_id' => $leave_type_id,

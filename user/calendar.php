@@ -1,50 +1,79 @@
 <?php
+/*
+ * TEAM CALENDAR PAGE - The Shared Calendar View! 📅
+ * =================================================
+ *
+ * Hey there! This page is like having a shared office calendar where employees
+ * can see who's going to be out and when. It's super helpful for planning!
+ *
+ * WHAT THIS PAGE SHOWS:
+ * - 📅 A monthly calendar view of the current month
+ * - 👥 Leave requests from their team/department members
+ * - 🔍 Visual indicators of who's out on what days
+ * - 🎨 Color-coded leave types (vacation, sick leave, etc.)
+ * - 🗓️ Navigation to browse different months
+ *
+ * WHY THIS IS USEFUL:
+ * - Helps plan meetings when everyone is available
+ * - Prevents too many people from the same team taking leave at once
+ * - Gives transparency about team workload coverage
+ * - Helps coordinate project timelines around planned absences
+ *
+ * Think of this as the "team coordination tool" - it helps everyone work
+ * together better by showing who's available when! 🤝
+ */
+
 // user/calendar.php - Team Calendar
 
 require_once '../php/functions.php';
 
-// Require login
+// SECURITY CHECK: Make sure someone is logged in before showing team calendar
 require_login();
 
-// Get current user data
+// GET USER INFORMATION: Who is viewing the calendar?
 $user = get_logged_in_user();
 
-// Get current month and year
-$month = isset($_GET['month']) ? (int)$_GET['month'] : date('n');
-$year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
+// GET CALENDAR MONTH/YEAR: What month are they looking at?
+$month = isset($_GET['month']) ? (int)$_GET['month'] : date('n');   // Current month by default
+$year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');      // Current year by default
 
-// Ensure valid month/year
-if ($month < 1 || $month > 12) $month = date('n');
-if ($year < 2020 || $year > 2030) $year = date('Y');
+// VALIDATE MONTH/YEAR: Make sure they're reasonable values
+if ($month < 1 || $month > 12) $month = date('n');                 // Reset to current month if invalid
+if ($year < 2020 || $year > 2030) $year = date('Y');               // Reset to current year if invalid
 
-// Get team members (same department)
+// GET TEAM MEMBERS: Find other people in the same department
 $team_members = [];
 if ($user['department_id']) {
+    // FIND DEPARTMENT COLLEAGUES: Get other active users in their department
     $team_members = db_fetch_all("
         SELECT id, name, employee_id
         FROM users
-        WHERE department_id = ? AND status = 'active' AND id != ?
+        WHERE department_id = ? AND status = 'active' AND id != ?  -- Same dept, active, not themselves
         ORDER BY name
     ", [$user['department_id'], $user['id']]);
 }
 
-// Add current user to the list
+// ADD CURRENT USER: Include themselves in the team list (marked as "Me")
 array_unshift($team_members, [
     'id' => $user['id'],
     'name' => $user['name'] . ' (Me)',
     'employee_id' => $user['employee_id']
 ]);
 
-// Get all team member IDs
+// GET TEAM IDS: Extract just the user IDs for database queries
 $team_ids = array_column($team_members, 'id');
 
-// Get leave data for the month
-$start_date = date('Y-m-01', mktime(0, 0, 0, $month, 1, $year));
-$end_date = date('Y-m-t', mktime(0, 0, 0, $month, 1, $year));
+// CALCULATE MONTH DATE RANGE: Get first and last day of the month we're viewing
+$start_date = date('Y-m-01', mktime(0, 0, 0, $month, 1, $year));    // First day of month
+$end_date = date('Y-m-t', mktime(0, 0, 0, $month, 1, $year));       // Last day of month
 
+// GET LEAVE DATA: Find all leave requests for team members during this month
 $leaves = [];
 if (!empty($team_ids)) {
+    // CREATE PLACEHOLDERS: For the SQL IN clause (one ? for each team member)
     $placeholders = str_repeat('?,', count($team_ids) - 1) . '?';
+
+    // QUERY TEAM LEAVE REQUESTS: Get all approved/pending leaves for the month
     $leaves = db_fetch_all("
         SELECT l.*, u.name as user_name, lt.name as leave_type_name, lt.id as leave_type_id
         FROM leaves l

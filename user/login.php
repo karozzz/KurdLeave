@@ -1,42 +1,51 @@
 <?php
 // user/login.php - Login Page
+// This is the first page people see when they visit the leave management system
+// It handles user authentication and redirects them to the right place based on their role
 
 require_once '../php/functions.php';
 
-// If already logged in, redirect
+// If someone is already logged in, don't show them the login page again
+// Instead, send them directly to their appropriate homepage
 if (is_logged_in()) {
     if (is_admin()) {
-        redirect(APP_URL . '/admin/admin_dashboard.php');
+        redirect(APP_URL . '/admin/admin_dashboard.php'); // Admins go to admin panel
     } else {
-        redirect(APP_URL . '/user/home.php');
+        redirect(APP_URL . '/user/home.php'); // Regular users go to user homepage
     }
 }
 
+// Variables to hold messages we want to show the user
 $error_message = '';
 $success_message = '';
 
-// Handle login form submission
+// HANDLE LOGIN FORM SUBMISSION
+// This runs when someone clicks the "Login" button
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the email and password they entered (clean up the email for security)
     $email = sanitize_input($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
+    // Make sure they filled in both fields
     if (empty($email) || empty($password)) {
         $error_message = 'Please enter both email and password.';
     } else {
+        // Try to log them in using the login function from functions.php
         if (login($email, $password)) {
-            // Redirect based on role
+            // Login successful! Send them to the right place based on their role
             if (is_admin()) {
-                redirect(APP_URL . '/admin/admin_dashboard.php');
+                redirect(APP_URL . '/admin/admin_dashboard.php'); // Admins get the admin panel
             } else {
-                redirect(APP_URL . '/user/home.php');
+                redirect(APP_URL . '/user/home.php'); // Everyone else gets the user homepage
             }
         } else {
+            // Login failed - wrong email or password
             $error_message = 'Invalid email or password.';
         }
     }
 }
 
-// Get flash messages
+// Check if there are any flash messages to show (like "Account created successfully")
 $flash = get_flash_message();
 if ($flash) {
     if ($flash['type'] === 'success') {
