@@ -1,6 +1,54 @@
 <?php
 require_once '../php/functions.php';
 require_admin();
+
+$success_message = '';
+$error_message = '';
+
+// Handle approve/reject actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $leave_id = (int)($_POST['leave_id'] ?? 0);
+    $action = $_POST['action'];
+    $comments = sanitize_input($_POST['admin_comments'] ?? '');
+
+    if ($leave_id && in_array($action, ['approve', 'reject'])) {
+        $status = ($action === 'approve') ? 'approved' : 'rejected';
+        $admin_id = $_SESSION['user_id'];
+
+        $update_data = [
+            'status' => $status,
+            'admin_comments' => $comments,
+            'approved_by' => $admin_id,
+            'approved_at' => date('Y-m-d H:i:s')
+        ];
+
+        if (db_update('leaves', $update_data, 'id = :id', [':id' => $leave_id])) {
+            // Update leave balance if approved
+            if ($status === 'approved') {
+                $leave = db_fetch("SELECT * FROM leaves WHERE id = ?", [$leave_id]);
+                if ($leave) {
+                    $year = date('Y', strtotime($leave['start_date']));
+                    $balance = get_user_leave_balance($leave['user_id'], $leave['leave_type_id'], $year);
+                    if ($balance) {
+                        $new_used = $balance['used_days'] + $leave['working_days'];
+                        $new_remaining = $balance['remaining_days'] - $leave['working_days'];
+                        db_update('leave_balances', [
+                            'used_days' => $new_used,
+                            'remaining_days' => max(0, $new_remaining)
+                        ], 'user_id = :user_id AND leave_type_id = :leave_type_id AND year = :year',
+                        [':user_id' => $leave['user_id'], ':leave_type_id' => $leave['leave_type_id'], ':year' => $year]);
+                    }
+                }
+            }
+
+            $success_message = "Leave request #L{$leave_id} has been {$status}.";
+            log_activity($admin_id, 'Leave ' . ucfirst($action), "Leave request #L{$leave_id} {$status}");
+        } else {
+            $error_message = "Failed to update leave request.";
+        }
+    }
+}
+
 $stats = get_dashboard_stats();
 $recent_activity = get_recent_activity(10);
 $pending_leaves = get_pending_leaves();
@@ -37,6 +85,18 @@ $pending_leaves = get_pending_leaves();
         <h2>Welcome, Administrator!</h2>
         <p>Today is <b><?php echo date('F j, Y'); ?></b> (<?php echo date('l'); ?>)</p>
       </div>
+
+      <?php if ($success_message): ?>
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
+        </div>
+      <?php endif; ?>
+      <?php if ($error_message): ?>
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_message); ?>
+        </div>
+      <?php endif; ?>
+
       <div class="stats-container">
         <div class="stat-card">
           <div class="stat-value"><?php echo $stats['active_users']; ?></div>
@@ -137,9 +197,9 @@ $pending_leaves = get_pending_leaves();
               <td class="text-center"><?php echo $leave['working_days']; ?></td>
               <td><?php echo format_datetime($leave['submitted_at']); ?></td>
               <td class="text-center">
-                <a href="admin_leave_review.php?id=<?php echo $leave['id']; ?>" class="btn btn-sm">
+                <button onclick="viewLeaveDetails(<?php echo htmlspecialchars(json_encode($leave)); ?>)" class="btn btn-sm">
                   <i class="fas fa-eye"></i> Review
-                </a>
+                </button>
               </td>
             </tr>
           <?php endforeach; ?>
@@ -158,6 +218,38 @@ $pending_leaves = get_pending_leaves();
       <p>KurdLeave System &copy; 2025</p>
     </div>
   </div>
+
+  <!-- Leave Details Modal -->
+  <div id="leaveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; max-width: 800px; width: 90%; max-height: 90%; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 id="modalTitle">Leave Request Details</h3>
+        <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div id="modalContent">
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Modal -->
+  <div id="actionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1001;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; max-width: 500px; width: 90%;">
+      <h3 id="actionTitle">Confirm Action</h3>
+      <form method="POST" action="admin_dashboard.php">
+        <input type="hidden" id="actionLeaveId" name="leave_id">
+        <input type="hidden" id="actionType" name="action">
+        <div style="margin: 1rem 0;">
+          <label for="admin_comments">Comments (optional):</label>
+          <textarea name="admin_comments" id="admin_comments" rows="3" style="width: 100%; margin-top: 5px;" placeholder="Add any comments about your decision..."></textarea>
+        </div>
+        <div style="text-align: center; margin-top: 1rem;">
+          <button type="submit" id="confirmActionBtn" class="btn">Confirm</button>
+          <button type="button" onclick="closeActionModal()" class="btn btn-danger">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <button class="back-to-top" id="backToTop">
     <i class="fas fa-arrow-up"></i>
   </button>
@@ -177,6 +269,91 @@ $pending_leaves = get_pending_leaves();
           behavior: 'smooth'
         });
       });
+    });
+
+    function viewLeaveDetails(leave) {
+      document.getElementById('modalTitle').textContent = 'Leave Request #L' + leave.id;
+      document.getElementById('modalContent').innerHTML = `
+        <div class="modal-section">
+          <h4>Employee Information</h4>
+          <p><strong>Name:</strong> ${leave.user_name}</p>
+          <p><strong>Employee ID:</strong> ${leave.employee_id}</p>
+          <p><strong>Department:</strong> ${leave.department_name || 'Not assigned'}</p>
+        </div>
+        <div class="modal-section">
+          <h4>Leave Details</h4>
+          <p><strong>Leave Type:</strong> ${leave.leave_type_name}</p>
+          <p><strong>Start Date:</strong> ${leave.start_date}</p>
+          <p><strong>End Date:</strong> ${leave.end_date}</p>
+          <p><strong>Working Days:</strong> ${leave.working_days}</p>
+          <p><strong>Status:</strong> <span class="status-badge status-${leave.status}">${leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}</span></p>
+        </div>
+        <div class="modal-section">
+          <h4>Request Information</h4>
+          <p><strong>Submitted:</strong> ${leave.submitted_at}</p>
+          <p><strong>Reason:</strong> ${leave.reason || 'No reason provided'}</p>
+        </div>
+        ${leave.status !== 'pending' ? `
+        <div class="modal-section">
+          <h4>Admin Decision</h4>
+          <p><strong>Approved By:</strong> ${leave.approved_by_name || 'System'}</p>
+          <p><strong>Decision Date:</strong> ${leave.approved_at || 'N/A'}</p>
+          <p><strong>Comments:</strong> ${leave.admin_comments || 'No comments'}</p>
+        </div>
+        ` : ''}
+        <div class="modal-actions" style="margin-top: 1rem; text-align: center;">
+          ${leave.status === 'pending' ? `
+            <button onclick="approveLeave(${leave.id})" class="btn btn-success">
+              <i class="fas fa-check"></i> Approve
+            </button>
+            <button onclick="rejectLeave(${leave.id})" class="btn btn-danger">
+              <i class="fas fa-times"></i> Reject
+            </button>
+          ` : ''}
+          <button onclick="closeModal()" class="btn btn-secondary">Close</button>
+        </div>
+      `;
+      document.getElementById('leaveModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('leaveModal').style.display = 'none';
+    }
+
+    function approveLeave(leaveId) {
+      document.getElementById('actionTitle').textContent = 'Approve Leave Request #L' + leaveId;
+      document.getElementById('actionLeaveId').value = leaveId;
+      document.getElementById('actionType').value = 'approve';
+      document.getElementById('confirmActionBtn').textContent = 'Approve';
+      document.getElementById('confirmActionBtn').className = 'btn btn-success';
+      document.getElementById('admin_comments').placeholder = 'Add any comments about the approval...';
+      document.getElementById('actionModal').style.display = 'block';
+      closeModal();
+    }
+
+    function rejectLeave(leaveId) {
+      document.getElementById('actionTitle').textContent = 'Reject Leave Request #L' + leaveId;
+      document.getElementById('actionLeaveId').value = leaveId;
+      document.getElementById('actionType').value = 'reject';
+      document.getElementById('confirmActionBtn').textContent = 'Reject';
+      document.getElementById('confirmActionBtn').className = 'btn btn-danger';
+      document.getElementById('admin_comments').placeholder = 'Please provide a reason for rejection...';
+      document.getElementById('actionModal').style.display = 'block';
+      closeModal();
+    }
+
+    function closeActionModal() {
+      document.getElementById('actionModal').style.display = 'none';
+      document.getElementById('admin_comments').value = '';
+    }
+
+    // Close modals when clicking outside
+    document.getElementById('leaveModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    document.getElementById('actionModal').addEventListener('click', function(e) {
+      if (e.target === this) closeActionModal();
     });
   </script>
 </body>

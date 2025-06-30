@@ -90,6 +90,7 @@ $stats = [
     <table class="main-header">
       <tr>
         <td colspan="7">
+          <h1>KurdLeave System - ADMIN PANEL</h1>
         </td>
       </tr>
       <tr>
@@ -109,20 +110,30 @@ $stats = [
       </div>
       <?php if ($success_message): ?>
         <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
         </div>
       <?php endif; ?>
       <?php if ($error_message): ?>
         <div class="alert alert-danger">
+          <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_message); ?>
         </div>
       <?php endif; ?>
       <div class="stats-container">
         <div class="stat-card">
+          <div class="stat-value"><?php echo $stats['pending']; ?></div>
+          <div class="stat-label">Pending Requests</div>
         </div>
         <div class="stat-card">
+          <div class="stat-value"><?php echo $stats['approved']; ?></div>
+          <div class="stat-label">Approved</div>
         </div>
         <div class="stat-card">
+          <div class="stat-value"><?php echo $stats['rejected']; ?></div>
+          <div class="stat-label">Rejected</div>
         </div>
         <div class="stat-card">
+          <div class="stat-value"><?php echo $stats['total']; ?></div>
+          <div class="stat-label">Total Requests</div>
         </div>
       </div>
     </div>
@@ -130,10 +141,28 @@ $stats = [
       <h3><i class="fas fa-filter"></i> Filter Leave Requests</h3>
       <form method="GET" action="" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
         <div>
+          <label for="status">Status:</label>
+          <select name="status" id="status">
+            <option value="all" <?php echo $status_filter === 'all' ? 'selected' : ''; ?>>All Status</option>
+            <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
+            <option value="approved" <?php echo $status_filter === 'approved' ? 'selected' : ''; ?>>Approved</option>
+            <option value="rejected" <?php echo $status_filter === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+          </select>
         </div>
         <div>
+          <label for="department">Department:</label>
+          <select name="department" id="department">
+            <option value="all">All Departments</option>
+            <?php foreach ($departments as $dept): ?>
+              <option value="<?php echo $dept['id']; ?>" <?php echo $department_filter == $dept['id'] ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($dept['name']); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div style="display: flex; align-items: end; gap: 10px;">
+          <button type="submit" class="btn"><i class="fas fa-search"></i> Filter</button>
+          <a href="admin_leaves.php" class="btn btn-secondary"><i class="fas fa-times"></i> Clear</a>
         </div>
       </form>
     </div>
@@ -145,9 +174,73 @@ $stats = [
       </h3>
       <?php if (empty($leaves)): ?>
         <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i> No leave requests found matching your criteria.
         </div>
       <?php else: ?>
         <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Request ID</th>
+                <th>Employee</th>
+                <th>Leave Type</th>
+                <th>Dates</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($leaves as $leave): ?>
+                <tr>
+                  <td>
+                    <b>#L<?php echo $leave['id']; ?></b>
+                  </td>
+                  <td>
+                    <b><?php echo htmlspecialchars($leave['user_name']); ?></b><br>
+                    <small><?php echo htmlspecialchars($leave['employee_id']); ?></small>
+                    <?php if ($leave['department_name']): ?>
+                      <br><small class="text-muted"><?php echo htmlspecialchars($leave['department_name']); ?></small>
+                    <?php endif; ?>
+                  </td>
+                  <td><?php echo htmlspecialchars($leave['leave_type_name']); ?></td>
+                  <td>
+                    <?php echo format_date($leave['start_date'], 'M j'); ?> -
+                    <?php echo format_date($leave['end_date'], 'M j, Y'); ?>
+                  </td>
+                  <td class="text-center"><?php echo $leave['working_days']; ?></td>
+                  <td>
+                    <?php
+                    $status_class = '';
+                    switch ($leave['status']) {
+                        case 'pending': $status_class = 'status-pending'; break;
+                        case 'approved': $status_class = 'status-approved'; break;
+                        case 'rejected': $status_class = 'status-rejected'; break;
+                    }
+                    ?>
+                    <span class="status-badge <?php echo $status_class; ?>">
+                      <?php echo ucfirst($leave['status']); ?>
+                    </span>
+                  </td>
+                  <td><?php echo format_datetime($leave['submitted_at']); ?></td>
+                  <td class="text-center">
+                    <button onclick="viewLeaveDetails(<?php echo htmlspecialchars(json_encode($leave)); ?>)" class="btn btn-sm">
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                    <?php if ($leave['status'] === 'pending'): ?>
+                      <button onclick="approveLeave(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-success">
+                        <i class="fas fa-check"></i> Approve
+                      </button>
+                      <button onclick="rejectLeave(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-danger">
+                        <i class="fas fa-times"></i> Reject
+                      </button>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
         </div>
       <?php endif; ?>
     </div>
@@ -167,7 +260,7 @@ $stats = [
   <div id="actionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1001;">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; max-width: 500px; width: 90%;">
       <h3 id="actionTitle">Confirm Action</h3>
-      <form method="POST" action="">
+      <form method="POST" action="admin_leaves.php">
         <input type="hidden" id="actionLeaveId" name="leave_id">
         <input type="hidden" id="actionType" name="action">
         <div style="margin: 1rem 0;">
@@ -195,6 +288,44 @@ $stats = [
     function viewLeaveDetails(leave) {
       document.getElementById('modalTitle').textContent = 'Leave Request #L' + leave.id;
       document.getElementById('modalContent').innerHTML = `
+        <div class="modal-section">
+          <h4>Employee Information</h4>
+          <p><strong>Name:</strong> ${leave.user_name}</p>
+          <p><strong>Employee ID:</strong> ${leave.employee_id}</p>
+          <p><strong>Department:</strong> ${leave.department_name || 'Not assigned'}</p>
+        </div>
+        <div class="modal-section">
+          <h4>Leave Details</h4>
+          <p><strong>Leave Type:</strong> ${leave.leave_type_name}</p>
+          <p><strong>Start Date:</strong> ${leave.start_date}</p>
+          <p><strong>End Date:</strong> ${leave.end_date}</p>
+          <p><strong>Working Days:</strong> ${leave.working_days}</p>
+          <p><strong>Status:</strong> <span class="status-badge status-${leave.status}">${leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}</span></p>
+        </div>
+        <div class="modal-section">
+          <h4>Request Information</h4>
+          <p><strong>Submitted:</strong> ${leave.submitted_at}</p>
+          <p><strong>Reason:</strong> ${leave.reason || 'No reason provided'}</p>
+        </div>
+        ${leave.status !== 'pending' ? `
+        <div class="modal-section">
+          <h4>Admin Decision</h4>
+          <p><strong>Approved By:</strong> ${leave.approved_by_name || 'System'}</p>
+          <p><strong>Decision Date:</strong> ${leave.approved_at || 'N/A'}</p>
+          <p><strong>Comments:</strong> ${leave.admin_comments || 'No comments'}</p>
+        </div>
+        ` : ''}
+        <div class="modal-actions">
+          ${leave.status === 'pending' ? `
+            <button onclick="approveLeave(${leave.id})" class="btn btn-success">
+              <i class="fas fa-check"></i> Approve
+            </button>
+            <button onclick="rejectLeave(${leave.id})" class="btn btn-danger">
+              <i class="fas fa-times"></i> Reject
+            </button>
+          ` : ''}
+          <button onclick="closeModal()" class="btn btn-secondary">Close</button>
+        </div>
       `;
       document.getElementById('leaveModal').style.display = 'block';
     }
